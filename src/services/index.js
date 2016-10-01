@@ -19,7 +19,7 @@ module.exports = function () {
 
     const knex_connection = knex( {
         client: 'pg',
-        connection: app.get( 'postgres' )
+        connection: app.get( 'postgres' )[ app.get( 'NODE_ENV' ) ]
     } );
     app.set( 'knex', knex_connection );
 

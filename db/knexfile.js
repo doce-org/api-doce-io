@@ -14,6 +14,18 @@ module.exports = {
         }
     },
 
+    raspberry: {
+        client: 'postgresql',
+        connection: 'postgres://postgres:postgres@localhost:5432/doce',
+        migrations: {
+            tableName: 'migrations',
+            directory: './migrations'
+        },
+        seeds: {
+            directory: './seeds'
+        }
+    },
+
     test: {
         client: 'postgresql',
         connection: 'postgres://postgres:@192.168.99.100:5433/doce-test',
