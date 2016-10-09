@@ -1,10 +1,14 @@
 'use strict';
 
 const hooks = require( 'feathers-hooks' );
+const params = require( '../../../hooks/params' );
+const record = require( './hooks' );
 
 exports.before = {
     all: [],
-    find: [],
+    find: [
+    	params.prepareSpecialParams( { params: [ 'withSensor' ] } )
+    ],
     get: [],
     create: [],
     update: [],
@@ -14,7 +18,9 @@ exports.before = {
 
 exports.after = {
     all: [],
-    find: [],
+    find: [
+    	record.getSensorIfNeeded()
+    ],
     get: [],
     create: [],
     update: [],
