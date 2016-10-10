@@ -38,7 +38,7 @@ exports.getSensorIfNeeded = function() {
 
 				Promise.all( sensor_promise )
 					.then( () => {
-						hook.result( grouped_sensors );
+						hook.result = grouped_sensors;
 						resolve( hook );
 					} )
 					.catch( reject );
