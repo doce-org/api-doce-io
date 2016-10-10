@@ -27,7 +27,7 @@ exports.getSensorIfNeeded = function() {
 				const grouped_sensors = _.groupBy( hook.result, 'temperature_sensor_id' );
 
 				const getSensor = function( id, data ) {
-					return hook.service( '/estimations/sensors' ).get( id )
+					return hook.app.service( '/estimations/sensors' ).get( id )
 						.then( sensor => data.sensor = sensor );
 				};
 
