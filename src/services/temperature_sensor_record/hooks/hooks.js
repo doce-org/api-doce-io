@@ -25,10 +25,11 @@ exports.getSensorIfNeeded = function() {
 			return new Promise( ( resolve, reject ) => {
 
 				const grouped_sensors = _.groupBy( hook.result, 'temperature_sensor_id' );
+				const sensor_list = [];
 
 				const getSensor = function( id, data ) {
 					return hook.app.service( '/temperatures/sensors' ).get( id )
-						.then( sensor => data.sensor = sensor );
+						.then( sensor => sensor_list.push( sensor ) );
 				};
 
 				const sensor_promise = [];
@@ -38,7 +39,9 @@ exports.getSensorIfNeeded = function() {
 
 				Promise.all( sensor_promise )
 					.then( () => {
-						hook.result = grouped_sensors;
+						hook.result = {};
+						hook.result.records = grouped_sensors;
+						hook.result.sensors = sensor_list;
 						resolve( hook );
 					} )
 					.catch( reject );
