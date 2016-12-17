@@ -8,14 +8,14 @@ module.exports = function () {
 
     const options = {
         Model: app.get( 'knex' ),
-        name: 'waters_gauges'
+        name: 'hardwares'
     };
 
     // Initialize our service with any options it requires
-    app.use( '/waters/gauges', service( options ) );
+    app.use( '/hardwares', service( options ) );
 
-    const sensorService = app.service( '/waters/gauges' );
-    sensorService.before( hooks.before );
-    sensorService.after( hooks.after );
+    const hardwareService = app.service( '/hardwares' );
+    hardwareService.before( hooks.before );
+    hardwareService.after( hooks.after );
 
 };

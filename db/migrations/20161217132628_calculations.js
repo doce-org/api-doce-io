@@ -17,7 +17,7 @@ exports.up = function( knex, Promise ) {
 		} )
 
 	] )
-  
+
 };
 
 exports.down = function( knex, Promise ) {
@@ -27,5 +27,5 @@ exports.down = function( knex, Promise ) {
 		knex.schema.dropTable( 'temperatures_sensors_calculations' )
 
 	] )
-  
+
 };

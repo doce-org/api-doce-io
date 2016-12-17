@@ -19,7 +19,7 @@ exports.convertData = function() {
         	const now = moment();
 
         	hook.app.service( '/powers/gauges/records' ).find( { 
-        			query: { $limit: 1, $sort: { created_at: -1 } } } 
+        			query: { $limit: 1, $sort: { created_at: -1 } } }
         		)
         		.then( records => {
 

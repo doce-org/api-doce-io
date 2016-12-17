@@ -1,18 +1,17 @@
 'use strict';
 
 const knex = require( 'knex' );
+
+const port = require( './port' );
+const hardware = require( './hardware' );
+const connection = require( './connection' );
 const room = require( './room' );
 const roomIcon = require( './room_icon' );
-const temperatureSensor = require( './temperature_sensor' );
 const temperatureSensorRecord = require( './temperature_sensor_record' );
-const temperatureSensorCalculation = require( './temperature_sensor_calculation' );
-const humiditySensor = require( './humidity_sensor' );
 const humiditySensorRecord = require( './humidity_sensor_record' );
-const powerGauge = require( './power_gauge' );
 const powerGaugeRecord = require( './power_gauge_record' );
-const waterGauge = require( './water_gauge' );
 const waterGaugeRecord = require( './water_gauge_record' );
-const newHardware = require( './new_hardware' );
+const temperatureSensorCalculation = require( './temperature_sensor_calculation' );
 
 module.exports = function () {
     const app = this;
@@ -23,27 +22,22 @@ module.exports = function () {
     } );
     app.set( 'knex', knex_connection );
 
+    // base
+    app.configure( port );
+    app.configure( hardware );
+    app.configure( connection );
+
+    // room
     app.configure( room );
     app.configure( roomIcon );
 
-    // temperature
-    app.configure( temperatureSensor );
+    // hardware
     app.configure( temperatureSensorRecord );
-    app.configure( temperatureSensorCalculation );
-
-    // humidity
-    app.configure( humiditySensor );
     app.configure( humiditySensorRecord );
-
-    // power
-    app.configure( powerGauge );
     app.configure( powerGaugeRecord );
-
-    // water
-    app.configure( waterGauge );
     app.configure( waterGaugeRecord );
 
-    // hardware
-    app.configure( newHardware );
+    // calculations
+    app.configure( temperatureSensorCalculation );
 
 };
