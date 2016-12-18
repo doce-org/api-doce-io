@@ -2,7 +2,7 @@
 
 const debug = require( 'debug' )( 'serialport' );
 
-/** 
+/**
  * defaults values
  * @type {Object}
  * @author shad
@@ -72,12 +72,12 @@ module.exports = function( app, serial ) {
 	 * record new data in specified service
 	 * @param {String} service
 	 * @param {Array} data
-	 * @param {integer} id   
+	 * @param {integer} id
 	 * @private
-	 * @author shad       
+	 * @author shad
 	 */
 	const _recordNewData = function( service, data, id ) {
-		
+
 		const foreignkey = defaults.foreignkey[ data[ 0 ] ];
 		const value = defaults.values[ data[ 0 ] ];
 		service = `${service}/records`;
@@ -110,8 +110,8 @@ module.exports = function( app, serial ) {
 
 	        		_findHardwareID( service, split_data[ 1 ] )
 	        			.then( id => {
-	        				id 
-	        					? _recordNewData( service, split_data, id ) 
+	        				id
+	        					? _recordNewData( service, split_data, id )
 	        					: _createNewHardware( split_data[ 0 ], split_data[ 1 ] );
 	        			} );
 

@@ -17,9 +17,9 @@ exports.up = function( knex, Promise ) {
         knex.schema.createTable( 'hardwares', table => {
 			table.increments( 'id' ).primary();
             table.integer( 'port_id' ).notNullable().references( 'id' ).inTable( 'ports' );
-			table.string( 'hardware_id' ).notNullable();
+            table.string( 'hardware_id' ).notNullable();
 			table.string( 'type' ).notNullable();
-            table.string( 'name' ).notNullable();
+            table.string( 'name' );
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
@@ -27,7 +27,7 @@ exports.up = function( knex, Promise ) {
             table.increments( 'id' ).primary();
             table.integer( 'port_id' ).notNullable().references( 'id' ).inTable( 'ports' );
             table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
-        } );
+        } )
 
     ] );
 
