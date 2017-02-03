@@ -1,9 +1,6 @@
 {
   "host": "localhost",
   "port": 3030,
-  "postgres": {
-  	"development": "postgres://postgres:@172.17.0.2:5432/doce",
-  	"raspberry": "postgres://postgres:postgres@localhost:5432/doce"
-  },
+  "postgres": "postgres://postgres:@postgres:5432/doce",
   "public": "../public/"
 }

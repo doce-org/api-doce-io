@@ -31,5 +31,6 @@ sleep 3
 
 docker run -d -p 3030:3030 --name ${CONTAINER_NAME} -e "NODE_ENV=development" \
     --link ${DB_CONTAINER_NAME}:postgres \
-    -v /home/shad/Documents/D.O.C.E/api.doce.io:/app \
+	--privileged -v /dev/bus/usb:/dev/bus/usb \
+    -v $(cd ../ && pwd):/app \
     node:6 /app/scripts/dev_entrypoint.sh

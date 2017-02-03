@@ -59,7 +59,7 @@ class ExtendedService extends Service {
 	 */
 	_createNewHardware = function( data, port_id ) {
 
-		debug( `registering a new hardware with id: ${hardware_id}` );
+		debug( `registering a new hardware with id: ${data.hardware_id}` );
 
         this.app.services( '/hardwares' ).create( { type: data.type, hardware_id: data.hardware_id, port_id } )
             .catch( console.error );

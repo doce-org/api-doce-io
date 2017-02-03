@@ -7,8 +7,8 @@ exports.up = function( knex, Promise ) {
         knex.schema.createTable( 'ports', table => {
 			table.increments( 'id' ).primary();
             table.string( 'name' ).notNullable();
-            table.string( 'com_name' ).notNullable();
             table.string( 'manufacturer' ).notNullable();
+			table.string( 'product' ).notNullable();
             table.string( 'serial_number' ).notNullable();
             table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 			table.timestamp( 'updated_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );

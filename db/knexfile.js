@@ -4,7 +4,7 @@ module.exports = {
 
     development: {
         client: 'postgresql',
-        connection: 'postgres://postgres:@172.17.0.2:5432/doce',
+        connection: 'postgres://postgres:@postgres:5432/doce',
         migrations: {
             tableName: 'migrations',
             directory: './migrations'
@@ -28,7 +28,7 @@ module.exports = {
 
     test: {
         client: 'postgresql',
-        connection: 'postgres://postgres:@172.17.0.2:5433/doce-test',
+        connection: 'postgres://postgres:@postgres:5433/doce-test',
         migrations: {
             tableName: 'migrations',
             directory: './migrations'
