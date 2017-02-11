@@ -6,8 +6,8 @@ const port = require( './hooks' );
 exports.before = {
     all: [],
     find: [
-        port.listConnectedsSerialPorts()
-    ],
+		port.listSerialPorts()
+	],
     get: [],
     create: [],
     update: [],
