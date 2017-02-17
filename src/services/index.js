@@ -22,6 +22,9 @@ const waterGaugeRecord = require( './water_gauge_record' );
 // calculations
 const temperatureSensorCalculation = require( './temperature_sensor_calculation' );
 
+// others
+const log = require( './log' );
+
 module.exports = function () {
     const app = this;
 
@@ -50,5 +53,8 @@ module.exports = function () {
 
     // calculations
     app.configure( temperatureSensorCalculation );
+
+	// others
+	app.configure( log );
 
 };

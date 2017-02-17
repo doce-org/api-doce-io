@@ -2,7 +2,6 @@
 
 const Service = require( 'feathers-knex' ).Service;
 const serialport = require( 'serialport' );
-const debug = require( 'debug' )( 'serialport' );
 const _ = require( 'lodash' );
 
 /**
@@ -41,7 +40,7 @@ class ExtendedService extends Service {
 	 */
 	_findHardwarePk = function( data ) {
 
-		debug( `trying to find hardware id: ${data.hardware_id}` );
+		// debug( `trying to find hardware id: ${data.hardware_id}` );
 
 		return this.app.services( '/hardwares' )
 			.find( { query: { hardware_id: data.hardware_id } } )
@@ -59,7 +58,7 @@ class ExtendedService extends Service {
 	 */
 	_createNewHardware = function( data, port_id ) {
 
-		debug( `registering a new hardware with id: ${data.hardware_id}` );
+		// debug( `registering a new hardware with id: ${data.hardware_id}` );
 
         this.app.services( '/hardwares' ).create( { type: data.type, hardware_id: data.hardware_id, port_id } )
             .catch( console.error );
@@ -80,7 +79,7 @@ class ExtendedService extends Service {
 		const value = defaults.values[ data.type ];
 		service = `${service}/records`;
 
-		debug( `record new data: ${data.value} in service: ${service}`);
+		// debug( `record new data: ${data.value} in service: ${service}`);
 
 		app.services[ service ].create( { hardware_id: id, [ value ]: data.value } )
 			.then( res => debug( `new data: added in service: ${service}` ) )
@@ -119,12 +118,13 @@ class ExtendedService extends Service {
 
         serial.on( 'open', {
 
-            debug( `port open: ${port.name}` );
+			// log
+			this.app.service( '/logs' ).create( { message: `port open: ${port.name}` } );
 
             // create connection in database
             return this.table.create( { port_id: port.id } )
-                .then( res => res )
-                .catch( console.error );
+            .then( res => res )
+            .catch( console.error );
 
         } );
 
@@ -141,27 +141,28 @@ class ExtendedService extends Service {
 
         serial.on( 'data', data => {
 
-    	    debug( `receiving data => ${data}` );
+    	    // log
+			this.app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${data}` } );
 
     	    // data format: <TYPE>;<HARDWARE_ID>;<VALUE>
     	    const split_data = data.split( ';' );
             const data_obj = _.zipObject( format, split_data );
     	    const dataIsValid = this._checkDataValidity( data_obj );
 
-            if( dataIsValid ) {
-
-                _findHardwarePk( data_obj ).then( id => {
-
-                    if( id ) {
-                        this._recordNewData( data_obj, id );
-                    }
-                    else {
-                        this._createNewHardware( data_obj, port.id );
-                    }
-
-                } );
-
-    	    }
+            // if( dataIsValid ) {
+			// 
+            //     _findHardwarePk( data_obj ).then( id => {
+			//
+            //         if( id ) {
+            //             this._recordNewData( data_obj, id );
+            //         }
+            //         else {
+            //             this._createNewHardware( data_obj, port.id );
+            //         }
+			//
+            //     } );
+			//
+    	    // }
 
     	}
 
@@ -177,13 +178,15 @@ class ExtendedService extends Service {
 
         serial.on( 'error', err => {
 
-    		console.error( `error: ${err}` );
+			// log
+			this.app.service( '/logs' ).create( { message: `port ${port.name} connection error: ${err}` } );
 
     	} );
 
     	serial.on( 'disconnect', message =>  {
 
-    		console.error( `disconnected: ${message}` ) ;
+			// log
+			this.app.service( '/logs' ).create( { message: `port ${port.name} disconnected: ${message}` } );
 
     	} );
 
@@ -199,7 +202,8 @@ class ExtendedService extends Service {
 
         serial.on( 'close', () => {
 
-            debug( `port open: ${data.name}` );
+			// log
+			this.app.service( '/logs' ).create( { message: `port ${port.name} connection has been closed` } );
 
         } );
 

@@ -17,6 +17,7 @@ exports.up = function( knex, Promise ) {
 		knex.schema.createTable( 'connections', table => {
 			table.increments( 'id' ).primary();
 			table.integer( 'port_id' ).notNullable().references( 'id' ).inTable( 'ports' );
+			table.boolean( 'active' ).notNullable().defaultTo( true );
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
