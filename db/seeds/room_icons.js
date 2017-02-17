@@ -1,6 +1,5 @@
 'use strict';
 
-
 exports.seed = function( knex, Promise ) {
 
     return knex( 'rooms_icons' ).delete()

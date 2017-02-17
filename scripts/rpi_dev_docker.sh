@@ -43,6 +43,6 @@ sleep 3
 
 docker run -d -p 3030:3030 --name ${CONTAINER_NAME} -e "NODE_ENV=development" \
     --link ${DB_CONTAINER_NAME}:postgres \
-	--privileged -v /dev/bus/usb:/dev/bus/usb \
+	--privileged -v /dev/t*:/dev/ \
     -v $(cd ../ && pwd):/app \
     hypriot/rpi-node /app/scripts/rpi_dev_entrypoint.sh

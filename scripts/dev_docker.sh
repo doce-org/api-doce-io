@@ -9,7 +9,7 @@ container_exist=`docker inspect -f '{{.Id}}' ${CONTAINER_NAME}`
 if [ ! -z $container_exist ];
     then
         echo "${CONTAINER_NAME} exist, removing"
-        docker stop ${CONTAINER_NAME}
+        docker kill ${CONTAINER_NAME}
         docker rm ${CONTAINER_NAME}
 fi
 
@@ -31,6 +31,6 @@ sleep 3
 
 docker run -d -p 3030:3030 --name ${CONTAINER_NAME} -e "NODE_ENV=development" \
     --link ${DB_CONTAINER_NAME}:postgres \
-	--privileged -v /dev/bus/usb:/dev/bus/usb \
+	--privileged -v /dev/:/dev/ \
     -v $(cd ../ && pwd):/app \
     node:6 /app/scripts/dev_entrypoint.sh

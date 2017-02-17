@@ -14,9 +14,7 @@ exports.before = {
 
 exports.after = {
     all: [],
-    find: [
-        hooks.populate( 'room_icon', { service: '/rooms/icons', field: 'room_icon_id' } )
-    ],
+    find: [],
     get: [],
     create: [],
     update: [],

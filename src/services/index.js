@@ -2,15 +2,24 @@
 
 const knex = require( 'knex' );
 
+// ports
 const port = require( './port' );
-const hardware = require( './hardware' );
+const portList = require( './port_list' );
 const connection = require( './connection' );
+
+// hardwares
+const hardware = require( './hardware' );
+
+// rooms
 const room = require( './room' );
-const roomIcon = require( './room_icon' );
+
+// sensors
 const temperatureSensorRecord = require( './temperature_sensor_record' );
 const humiditySensorRecord = require( './humidity_sensor_record' );
 const powerGaugeRecord = require( './power_gauge_record' );
 const waterGaugeRecord = require( './water_gauge_record' );
+
+// calculations
 const temperatureSensorCalculation = require( './temperature_sensor_calculation' );
 
 module.exports = function () {
@@ -24,12 +33,14 @@ module.exports = function () {
 
     // base
     app.configure( port );
-    app.configure( hardware );
+    app.configure( portList );
     app.configure( connection );
 
-    // room
+	// hardware
+	app.configure( hardware );
+
+	// room
     app.configure( room );
-    app.configure( roomIcon );
 
     // hardware
     app.configure( temperatureSensorRecord );
