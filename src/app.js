@@ -29,8 +29,8 @@ app.use( compress() )
     .configure( rest() )
     .configure( socketio() )
     .configure( services )
-    .configure( middleware );
-    //.configure( serial )
+    .configure( middleware )
+    .configure( serial );
     //.configure( cron );
 
 module.exports = app;

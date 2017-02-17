@@ -1,6 +1,6 @@
 'use strict';
 
-const service = require( 'feathers-knex' );
+const service = require( './connection.service.extend' );
 const hooks = require( './hooks' );
 
 module.exports = function () {
