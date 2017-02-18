@@ -120,7 +120,7 @@ module.exports = function() {
 		const _recordNewData = function( data, hardware ) {
 
 			// get the service on which to save the new record
-			const service = defaults.service[ data.type ];
+			const service = defaults.services[ data.type ];
 
 			return app.service[ service ].create( { hardware_id: hardware.id, [ value ]: data.value } )
 			.then( res => {
