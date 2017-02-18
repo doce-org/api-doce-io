@@ -89,9 +89,9 @@ const _serialdata = function( app, serial, port ) {
 		app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${data}` } );
 
 		// data format: <TYPE>;<HARDWARE_ID>;<VALUE>
-		const split_data = data.split( ';' );
-		const data_obj = _.zipObject( format, split_data );
-		const dataIsValid = this._checkDataValidity( data_obj );
+		// const split_data = data.split( ';' );
+		// const data_obj = _.zipObject( format, split_data );
+		// const dataIsValid = this._checkDataValidity( data_obj );
 
 		// if( dataIsValid ) {
 		//
