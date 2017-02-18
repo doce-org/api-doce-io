@@ -144,7 +144,7 @@ module.exports = function() {
 
 		serial.on( 'data', raw_data => {
 
-			app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${data}` } );
+			app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${raw_data}` } );
 
 			// raw_data format: <TYPE>;<HARDWARE_ID>;<VALUE>
 			const split_data = raw_data.split( ';' );
