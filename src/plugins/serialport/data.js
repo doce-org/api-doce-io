@@ -93,7 +93,7 @@ module.exports = function() {
 			const query = { query: {
 
 				// find the hardware id
-				'hardware_id': data.hardware_id,
+				'identifier': data.identifier,
 
 				// type has to be the one requested
 				'type': defaults.types[ data.type ]
