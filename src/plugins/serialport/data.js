@@ -63,9 +63,10 @@ module.exports = function() {
 			}
 
 			// hardware id has to have a length of 8 char.
-			if( data.hardware_id.length !== 8 ) {
+			// 28 FF 5F 42 74 15 03 D5
+			if( data.hardware_id.length !== 24 ) {
 
-				app.service( '/logs' ).create( { message: `port ${port.name} has receiving a malformed hardware id` } );
+				app.service( '/logs' ).create( { message: `port ${port.name} has received a malformed hardware id` } );
 				return;
 
 			}
