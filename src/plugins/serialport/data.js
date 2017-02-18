@@ -122,7 +122,7 @@ module.exports = function() {
 			// get the service on which to save the new record
 			const service = defaults.service[ data.type ];
 
-			app.service[ service ].create( { hardware_id: hardware.id, [ value ]: data.value } )
+			return app.service[ service ].create( { hardware_id: hardware.id, [ value ]: data.value } )
 			.then( res => {
 
 				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name} of value ${data.value}` } );
