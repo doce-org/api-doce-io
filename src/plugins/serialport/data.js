@@ -100,7 +100,7 @@ module.exports = function() {
 
 			} };
 
-			return app.services( '/hardwares' )
+			return app.service( '/hardwares' )
 			.find( query )
 			.then( results => results.length > 0 && results[ 0 ] )
 			.catch( console.error );
@@ -122,7 +122,7 @@ module.exports = function() {
 			// get the service on which to save the new record
 			const service = defaults.service[ data.type ];
 
-			app.services[ service ].create( { hardware_id: hardware.id, [ value ]: data.value } )
+			app.service[ service ].create( { hardware_id: hardware.id, [ value ]: data.value } )
 			.then( res => {
 
 				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name} of value ${data.value}` } );
