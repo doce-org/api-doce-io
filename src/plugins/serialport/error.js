@@ -2,21 +2,31 @@
 
 /**
  * serial port error handling
+ *
  * @param {Object} serial
+ * @param {Object} port
+ *
  * @author shad
  */
-module.exports = function( serial ) {
+module.exports = function() {
 
-	serial.on( 'error', err => {
+	return function( serial, port ) {
+		const app = this;
 
-		console.error( `error: ${err}` );
+		serial.on( 'error', err => {
 
-	} );
+			// log
+			app.service( '/logs' ).create( { message: `port ${port.name} connection error: ${err}` } );
 
-	serial.on( 'disconnect', message =>  {
+		} );
 
-		console.error( `disconnected: ${message}` ) ;
+		serial.on( 'disconnect', message =>  {
 
-	} );
+			// log
+			app.service( '/logs' ).create( { message: `port ${port.name} disconnected: ${message}` } );
 
-}
+		} );
+
+	};
+
+};

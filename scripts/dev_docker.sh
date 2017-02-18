@@ -22,7 +22,7 @@ if [ ! -z $db_container_exist ];
         docker start ${DB_CONTAINER_NAME}
     else
         echo "postgres container not found, creating..."
-        docker run -d -p 5432:5432 --name ${DB_CONTAINER_NAME} -e "POSTGRES_USER=postgres" -e "POSTGRES_DB=doce" postgres
+        docker run -d -p 5432:5432 --name ${DB_CONTAINER_NAME} -e "POSTGRES_USER=postgres" -e "POSTGRES_DB=doce" postgres:9.6
 fi
 
 # sleep 3 seconds to be sure the
@@ -33,4 +33,4 @@ docker run -d -p 3030:3030 --name ${CONTAINER_NAME} -e "NODE_ENV=development" \
     --link ${DB_CONTAINER_NAME}:postgres \
 	--privileged -v /dev/:/dev/ \
     -v $(cd ../ && pwd):/app \
-    node:6 /app/scripts/dev_entrypoint.sh
+    node:7 /app/scripts/dev_entrypoint.sh
