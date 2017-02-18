@@ -14,10 +14,10 @@ const _ = require( 'lodash' );
 const defaults = {
 
 	services: {
-		'TEMP': '/temperatures/sensors/records',
-		'HUMIDITY': '/humidities/sensors/records',
-		'POWER': '/powers/gauges/records',
-		'WATER': '/waters/gauges/records'
+		'TEMP': 'temperatures/sensors/records',
+		'HUMIDITY': 'humidities/sensors/records',
+		'POWER': 'powers/gauges/records',
+		'WATER': 'waters/gauges/records'
 	},
 
 	types: {
@@ -57,7 +57,7 @@ module.exports = function() {
 			// if type of data isn't find in the permitted list of type
 			if( !defaults.types[ data.type ] ) {
 
-				app.service( '/logs' ).create( { message: `port ${port.name} has receiving data but could not find a type match` } );
+				app.service( '/logs' ).create( { message: `port ${port.name} has received data but could not find a type match` } );
 				return;
 
 			}
@@ -71,7 +71,7 @@ module.exports = function() {
 			//
 			// }
 
-			app.service( '/logs' ).create( { message: `port ${port.name} has receiving properly formatted data of type ${defaults.types[ data.type ]}` } );
+			app.service( '/logs' ).create( { message: `port ${port.name} has received properly formatted data of type ${defaults.types[ data.type ]}` } );
 			return true;
 
 		}
@@ -110,6 +110,7 @@ module.exports = function() {
 		/**
 		 * record new data in specified service
 		 *
+		 * @param {Object} port
 		 * @param {Array} data
 		 * @param {Object} hardware
 		 *
@@ -117,7 +118,7 @@ module.exports = function() {
 		 *
 		 * @author shad
 		 */
-		const _recordNewData = function( data, hardware ) {
+		const _recordNewData = function( port, data, hardware ) {
 
 			// get the service on which to save the new record
 			const service = defaults.services[ data.type ];
@@ -164,7 +165,7 @@ module.exports = function() {
 
 					// record the new data linked to the hardware found
 					app.service( '/logs' ).create( { message: `found the hardware identifier requested: ${hardware.name}` } );
-					_recordNewData( data, hardware );
+					_recordNewData( port, data, hardware );
 
 			    } );
 
