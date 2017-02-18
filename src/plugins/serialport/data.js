@@ -100,7 +100,7 @@ module.exports = function() {
 
 			} };
 
-			return this.app.services( '/hardwares' )
+			return app.services( '/hardwares' )
 			.find( query )
 			.then( results => results.length > 0 && results[ 0 ] )
 			.catch( console.error );
