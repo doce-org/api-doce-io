@@ -64,12 +64,12 @@ module.exports = function() {
 
 			// hardware id has to have a length of 8 char.
 			// 28 FF 5F 42 74 15 03 D5
-			if( data.identifier.length !== 24 ) {
-
-				app.service( '/logs' ).create( { message: `port ${port.name} has received a malformed hardware id` } );
-				return;
-
-			}
+			// if( data.identifier.length !== 24 ) {
+			//
+			// 	app.service( '/logs' ).create( { message: `port ${port.name} has received a malformed hardware id` } );
+			// 	return;
+			//
+			// }
 
 			app.service( '/logs' ).create( { message: `port ${port.name} has receiving properly formatted data of type ${defaults.types[ data.type ]}` } );
 			return true;
