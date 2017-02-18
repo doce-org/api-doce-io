@@ -1,7 +1,17 @@
 'use strict';
 
 const moment = require( 'moment' );
+const errors = require( 'feathers-errors' );
 
+/**
+ * convert the power result depending on timespan
+ * between now and the last result recorded to get
+ * accurate power use
+ *
+ * @return {Object}
+ *
+ * @author shad
+ */
 exports.convertData = function() {
 
 	return function( hook ) {
@@ -17,26 +27,41 @@ exports.convertData = function() {
         return new Promise( ( resolve, reject ) => {
 
         	const now = moment();
+			const query = { query: {
 
-        	hook.app.service( '/powers/gauges/records' ).find( { 
-        			query: { $limit: 1, $sort: { created_at: -1 } } }
-        		)
-        		.then( records => {
+				// limit to one result
+				$limit: 1,
 
-        			if( records.length === 1 ) {
-        				const record = records[ 0 ];
-        				const diff = now.diff( record.created_at, 'minutes' );
+				// sort to only get the last one
+				$sort: { created_at: -1 }
 
-        				if( diff < 20 ) {
-        					hook.data.power = +hook.data.energy / ( diff / 60 );
-        				}
+			} };
 
+        	hook.app.service( '/powers/gauges/records' )
+			.find( query )
+        	.then( records => {
+
+				// if we've found a record
+        		if( records.length === 1 ) {
+
+        			const record = records[ 0 ];
+
+					// get the difference in minutes between the last record
+					// on the current time
+        			const diff = now.diff( record.created_at, 'minutes' );
+
+					// if we have a difference inferior to 20 minutes, calculate
+					// the real power used on this timespan
+        			if( diff < 20 ) {
+        				hook.data.power = +hook.data.energy / ( diff / 60 );
         			}
 
-        			resolve( hook );
+        		}
 
-        		} )
-        		.catch( reject );
+        		resolve( hook );
+
+        	} )
+        	.catch( reject );
 
         } );
 
