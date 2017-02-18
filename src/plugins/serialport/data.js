@@ -14,10 +14,10 @@ const _ = require( 'lodash' );
 const defaults = {
 
 	services: {
-		'TEMP': 'temperatures/sensors/records',
-		'HUMIDITY': 'humidities/sensors/records',
-		'POWER': 'powers/gauges/records',
-		'WATER': 'waters/gauges/records'
+		'TEMP': '/temperatures/sensors/records',
+		'HUMIDITY': '/humidities/sensors/records',
+		'POWER': '/powers/gauges/records',
+		'WATER': '/waters/gauges/records'
 	},
 
 	types: {
@@ -123,7 +123,7 @@ module.exports = function() {
 			// get the service on which to save the new record
 			const service = defaults.services[ data.type ];
 
-			return app.service[ service ].create( { hardware_id: hardware.id, [ value ]: data.value } )
+			return app.service( service ).create( { hardware_id: hardware.id, [ value ]: data.value } )
 			.then( res => {
 
 				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name} of value ${data.value}` } );
