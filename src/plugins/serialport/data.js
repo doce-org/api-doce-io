@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require( 'lodash' );
+const isJSON = require( 'is-json' );
 
 /**
  * defaults
@@ -42,7 +43,7 @@ const defaults = {
 module.exports = function() {
 
 	return function( serial, port ) {
-		
+
 		const app = this;
 
 		/**
@@ -138,32 +139,38 @@ module.exports = function() {
 
 			app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${raw_data}` } );
 
-			// raw_data format: <TYPE>;<HARDWARE_ID>;<VALUE>
-			const data = JSON.parse( raw_data ); // raw_data.split( ';' );
+			// test received data is actually a valid JSON
+			if ( isJSON( raw_data ) ) {
 
-			// check data validity so we don't record malformed data
-			const data_is_valid = _checkDataValidity( data );
+				// raw_data format: <TYPE>;<HARDWARE_ID>;<VALUE>
+				const data = JSON.parse( raw_data ); // raw_data.split( ';' );
 
-			if( data_is_valid ) {
+				// check data validity so we don't record malformed data
+				const data_is_valid = _checkDataValidity( data );
 
-				// find the requested hardware based on a given identifier and the type of the record
-			    _findHardwarePk( data ).then( hardware => {
+				if ( data_is_valid ) {
 
-					// if none was found, no hardware of the requested identifier exist. exiting
-					if( !hardware ) {
+					// find the requested hardware based on a given identifier and the type of the record
+					_findHardwarePk( data ).then( hardware => {
 
-						app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested hardware identifier. discarding` } );
-						return;
+						// if none was found, no hardware of the requested identifier exist. exiting
+						if ( !hardware ) {
 
-					}
+							app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested hardware identifier. discarding` } );
+							return;
 
-					// record the new data linked to the hardware found
-					app.service( '/logs' ).create( { message: `found the hardware identifier requested: ${hardware.name}` } );
-					_recordNewData( port, data, hardware );
+						}
 
-			    } );
+						// record the new data linked to the hardware found
+						app.service( '/logs' ).create( { message: `found the hardware identifier requested: ${hardware.name}` } );
+						_recordNewData( port, data, hardware );
+
+					} );
+
+				}
 
 			}
+
 
 		} );
 
