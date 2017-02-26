@@ -16,8 +16,8 @@ const defaults = {
 	services: {
 		'TEMP': '/temperatures/sensors/records',
 		'HUMIDITY': '/humidities/sensors/records',
-		'POWER': '/powers/gauges/records',
-		'WATER': '/waters/gauges/records'
+		'POWER': '/powers/meters/records',
+		'WATER': '/waters/meters/records'
 	},
 
 	types: {
@@ -42,8 +42,8 @@ const defaults = {
 module.exports = function() {
 
 	return function( serial, port ) {
+		
 		const app = this;
-		const format = [ 'type', 'identifier', 'value' ];
 
 		/**
 		 * check data validity
@@ -113,10 +113,17 @@ module.exports = function() {
 
 			// get the service on which to save the new record
 			const service = defaults.services[ data.type ];
-			const value = defaults.types[ data.type ];
+
+			// extract only the data to be recorded by removing the type and the
+			// hardware identifier which aren't needed, everything else has to be
+			// part of the requested service model ( temperature, power... )
+			let values = _.omit( data, [ 'type', 'identifier' ] );
+
+			// add to the required data the hardware id previously found in `_findHardwarePk`
+			values = Object.assign( {}, { hardware_id: hardware.id }, values );
 
 			return app.service( service )
-			.create( { hardware_id: hardware.id, [ value ]: data.value } )
+			.create( values )
 			.then( res => {
 
 				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name} of value ${data.value}` } );
@@ -132,13 +139,7 @@ module.exports = function() {
 			app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${raw_data}` } );
 
 			// raw_data format: <TYPE>;<HARDWARE_ID>;<VALUE>
-			const split_data = raw_data.split( ';' );
-
-			// zip the result to a properly formatted object
-			// 1 => type
-			// 2 => hardware id
-			// 3 => value
-			const data = _.zipObject( format, split_data );
+			const data = JSON.parse( raw_data ); // raw_data.split( ';' );
 
 			// check data validity so we don't record malformed data
 			const data_is_valid = _checkDataValidity( data );
