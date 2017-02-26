@@ -6,6 +6,7 @@ exports.up = function( knex, Promise ) {
 
         knex.schema.createTable( 'logs', table => {
 			table.increments( 'id' ).primary();
+			table.enum( 'type', [ 'info', 'warning', 'error' ] ).notNullable().defaultTo( 'info' );
 			table.string( 'message' ).notNullable();
             table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} )

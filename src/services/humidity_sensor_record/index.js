@@ -14,8 +14,8 @@ module.exports = function () {
     // Initialize our service with any options it requires
     app.use( '/humidities/sensors/records', service( options ) );
 
-    const sensorsDataService = app.service( '/humidities/sensors/records' );
-    sensorsDataService.before( hooks.before );
-    sensorsDataService.after( hooks.after );
-    
+    const humiditySensorRecordService = app.service( '/humidities/sensors/records' );
+    humiditySensorRecordService.before( hooks.before );
+    humiditySensorRecordService.after( hooks.after );
+
 };

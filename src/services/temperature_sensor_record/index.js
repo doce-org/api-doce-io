@@ -14,8 +14,8 @@ module.exports = function () {
     // Initialize our service with any options it requires
     app.use( '/temperatures/sensors/records', service( options ) );
 
-    const sensorsDataService = app.service( '/temperatures/sensors/records' );
-    sensorsDataService.before( hooks.before );
-    sensorsDataService.after( hooks.after );
-    
+    const temperatureSensorRecordService = app.service( '/temperatures/sensors/records' );
+    temperatureSensorRecordService.before( hooks.before );
+    temperatureSensorRecordService.after( hooks.after );
+
 };

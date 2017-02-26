@@ -16,8 +16,8 @@ const room = require( './room' );
 // sensors
 const temperatureSensorRecord = require( './temperature_sensor_record' );
 const humiditySensorRecord = require( './humidity_sensor_record' );
-const powerGaugeRecord = require( './power_gauge_record' );
-const waterGaugeRecord = require( './water_gauge_record' );
+const powerMeterRecord = require( './power_meter_record' );
+const waterMeterRecord = require( './water_meter_record' );
 
 // calculations
 const temperatureSensorCalculation = require( './temperature_sensor_calculation' );
@@ -48,8 +48,8 @@ module.exports = function () {
     // hardware
     app.configure( temperatureSensorRecord );
     app.configure( humiditySensorRecord );
-    app.configure( powerGaugeRecord );
-    app.configure( waterGaugeRecord );
+    app.configure( powerMeterRecord );
+    app.configure( waterMeterRecord );
 
     // calculations
     app.configure( temperatureSensorCalculation );

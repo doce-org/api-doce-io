@@ -14,11 +14,12 @@ exports.up = function( knex, Promise ) {
 		knex.schema.createTable( 'humidities_sensors_records', table => {
 			table.increments( 'id' ).primary();
 			table.integer( 'hardware_id' ).notNullable().references( 'id' ).inTable( 'hardwares' );
+			table.decimal( 'temperature' ).notNullable();
 			table.decimal( 'humidity' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
-		knex.schema.createTable( 'powers_gauges_records', table => {
+		knex.schema.createTable( 'powers_meters_records', table => {
 			table.increments( 'id' ).primary();
 			table.integer( 'hardware_id' ).notNullable().references( 'id' ).inTable( 'hardwares' );
 			table.decimal( 'power' ).notNullable().defaultTo( 0 );
@@ -26,7 +27,7 @@ exports.up = function( knex, Promise ) {
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
-		knex.schema.createTable( 'waters_gauges_records', table => {
+		knex.schema.createTable( 'waters_meters_records', table => {
 			table.increments( 'id' ).primary();
 			table.integer( 'hardware_id' ).notNullable().references( 'id' ).inTable( 'hardwares' );
 			table.decimal( 'water' ).notNullable();

@@ -57,19 +57,10 @@ module.exports = function() {
 			// if type of data isn't find in the permitted list of type
 			if( !defaults.types[ data.type ] ) {
 
-				app.service( '/logs' ).create( { message: `port ${port.name} has received data but could not find a type match` } );
+				app.service( '/logs' ).create( { type: 'warning', message: `port ${port.name} has received data but could not find a type match` } );
 				return;
 
 			}
-
-			// hardware id has to have a length of 8 char.
-			// 28 FF 5F 42 74 15 03 D5
-			// if( data.identifier.length !== 24 ) {
-			//
-			// 	app.service( '/logs' ).create( { message: `port ${port.name} has received a malformed hardware id` } );
-			// 	return;
-			//
-			// }
 
 			app.service( '/logs' ).create( { message: `port ${port.name} has received properly formatted data of type ${defaults.types[ data.type ]}` } );
 			return true;
@@ -160,7 +151,7 @@ module.exports = function() {
 					// if none was found, no hardware of the requested identifier exist. exiting
 					if( !hardware ) {
 
-						app.service( '/logs' ).create( { message: `could not find the requested hardware identifier. discarding` } );
+						app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested hardware identifier. discarding` } );
 						return;
 
 					}

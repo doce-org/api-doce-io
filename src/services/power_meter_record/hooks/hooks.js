@@ -37,7 +37,7 @@ exports.convertData = function() {
 
 			} };
 
-        	hook.app.service( '/powers/gauges/records' )
+        	hook.app.service( '/powers/meters/records' )
 			.find( query )
         	.then( records => {
 

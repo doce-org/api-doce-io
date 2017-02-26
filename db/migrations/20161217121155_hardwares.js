@@ -14,6 +14,7 @@ exports.up = function( knex, Promise ) {
 			table.timestamp( 'updated_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
+		// TODO removed for an in memory table
 		knex.schema.createTable( 'connections', table => {
 			table.increments( 'id' ).primary();
 			table.integer( 'port_id' ).notNullable().references( 'id' ).inTable( 'ports' );

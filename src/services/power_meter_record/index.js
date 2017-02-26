@@ -8,14 +8,14 @@ module.exports = function () {
 
     const options = {
         Model: app.get( 'knex' ),
-        name: 'waters_gauges_records'
+        name: 'powers_meters_records'
     };
 
     // Initialize our service with any options it requires
-    app.use( '/waters/gauges/records', service( options ) );
+    app.use( '/powers/meters/records', service( options ) );
 
-    const sensorService = app.service( '/waters/gauges/records' );
-    sensorService.before( hooks.before );
-    sensorService.after( hooks.after );
+    const powerMeterRecordService = app.service( '/powers/meters/records' );
+    powerMeterRecordService.before( hooks.before );
+    powerMeterRecordService.after( hooks.after );
 
 };
