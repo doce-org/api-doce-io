@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require( 'lodash' );
-const isJSON = require( 'is-json' );
 
 /**
  * defaults
@@ -127,10 +126,34 @@ module.exports = function() {
 			.create( values )
 			.then( res => {
 
-				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name} of value ${data.value}` } );
+				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name}` } );
 
 			} )
 			.catch( console.error );
+
+		}
+
+		/**
+		 * check if the received data is a proper JSON
+		 *
+		 * @param  {String}  str
+		 *
+		 * @author shad
+		 */
+		const _isJSON = function( str ) {
+
+			try {
+
+				const result = JSON.parse( str );
+				return result;
+
+			}
+
+			catch (e) {
+
+				return false;
+
+			}
 
 		}
 
@@ -139,11 +162,11 @@ module.exports = function() {
 
 			app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${raw_data}` } );
 
-			// test received data is actually a valid JSON
-			if ( isJSON( raw_data ) ) {
-
-				// raw_data format: <TYPE>;<HARDWARE_ID>;<VALUE>
-				const data = JSON.parse( raw_data ); // raw_data.split( ';' );
+			// test received data is actually a valid JSON while
+			// parsing and returning the parsed result or false
+			const data = _isJSON( raw_data );
+			
+			if ( data ) {
 
 				// check data validity so we don't record malformed data
 				const data_is_valid = _checkDataValidity( data );
