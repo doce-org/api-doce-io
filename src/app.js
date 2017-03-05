@@ -14,7 +14,6 @@ const middleware = require( './middleware' );
 const services = require( './services' );
 const views = require( './views' );
 const serial = require( './plugins/serialport' );
-const cron = require( './plugins/cron' );
 
 const app = feathers();
 
@@ -33,6 +32,5 @@ app.use( compress() )
     .configure( views )
     .configure( middleware )
     .configure( serial );
-    //.configure( cron );
 
 module.exports = app;

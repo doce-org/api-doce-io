@@ -1,10 +1,9 @@
 'use strict';
 
-const Service = require( 'feathers-knex' ).Service;
 const errors = require( 'feathers-errors' );
 const serialPort = require( 'serialport' );
 
-class ExtendedService extends Service {
+class Service {
 
 	/**
 	 * setup extended service
@@ -21,6 +20,8 @@ class ExtendedService extends Service {
 	 * @param {Object} params
 	 *
 	 * @override
+	 *
+	 * @requires serialport
 	 *
 	 * @author shad
 	 */
@@ -46,6 +47,8 @@ class ExtendedService extends Service {
 
 }
 
-module.exports = function init( Model ) {
-  return new ExtendedService( Model );
+module.exports = function init() {
+
+  	return new Service();
+
 };

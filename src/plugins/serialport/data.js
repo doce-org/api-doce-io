@@ -137,10 +137,11 @@ module.exports = function() {
 		 * check if the received data is a proper JSON
 		 *
 		 * @param  {String}  str
+		 * @param {Object} port
 		 *
 		 * @author shad
 		 */
-		const _isJSON = function( str ) {
+		const _isJSON = function( str, port ) {
 
 			try {
 
@@ -150,6 +151,8 @@ module.exports = function() {
 			}
 
 			catch (e) {
+
+				app.service( '/logs' ).create( { type: 'error', message: `port ${port.name} has failed to parse JSON data: ${str}` } );
 
 				return false;
 
@@ -164,8 +167,8 @@ module.exports = function() {
 
 			// test received data is actually a valid JSON while
 			// parsing and returning the parsed result or false
-			const data = _isJSON( raw_data );
-			
+			const data = _isJSON( raw_data, port );
+
 			if ( data ) {
 
 				// check data validity so we don't record malformed data

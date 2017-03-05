@@ -27,6 +27,7 @@ exports.convertData = function() {
         return new Promise( ( resolve, reject ) => {
 
         	const now = moment();
+
 			const query = { query: {
 
 				// limit to one result
@@ -46,14 +47,15 @@ exports.convertData = function() {
 
         			const record = records[ 0 ];
 
-					// get the difference in minutes between the last record
-					// on the current time
+					// get the difference in minutes between the last record on the current time
         			const diff = now.diff( record.created_at, 'minutes' );
 
 					// if we have a difference inferior to 20 minutes, calculate
 					// the real power used on this timespan
         			if( diff < 20 ) {
+						
         				hook.data.power = +hook.data.energy / ( diff / 60 );
+						
         			}
 
         		}
