@@ -2,6 +2,7 @@
 
 // services
 const hardwareTemperature = require( './hardware_temperature' );
+const hardwareHumidity = require( './hardware_humidity' );
 
 module.exports = function () {
 
@@ -9,5 +10,6 @@ module.exports = function () {
 
 	// hardwares
 	app.configure( hardwareTemperature );
+	app.configure( hardwareHumidity );
 
 };

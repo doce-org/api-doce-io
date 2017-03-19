@@ -1,5 +1,4 @@
--- create a view to return an hardware listing with the listing of linked temperatures
--- and also the room name
+-- create a view to return an hardware listing with the listing of linked temperatures and also the room name
 CREATE VIEW hardwares_temperatures AS
 SELECT "hardwares".*,
 	"rooms"."name" AS "room_name",
