@@ -34,7 +34,7 @@ if [ ! -z $db_container_exist ];
         docker start ${DB_CONTAINER_NAME}
     else
         echo "postgres container not found, creating..."
-        docker run -d -p 5432:5432 --name ${DB_CONTAINER_NAME} -e "POSTGRES_USER=postgres" -e "POSTGRES_DB=doce" rotschopf/rpi-postgres
+        docker run -d -p 5432:5432 --name ${DB_CONTAINER_NAME} -e "POSTGRES_USER=postgres" -e "POSTGRES_DB=doce" tobi312/rpi-postgresql
 fi
 
 # sleep 3 seconds to be sure the
