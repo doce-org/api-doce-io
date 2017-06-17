@@ -1,6 +1,6 @@
 {
   "host": "doce-server-app.feathersjs.com",
   "port": 80,
-  "mongodb": "DATABASE_URL",
+  "postgres": "postgres://postgres:@postgres:5432/doce",
   "public": "../public/"
 }
