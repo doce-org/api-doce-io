@@ -41,7 +41,7 @@ const defaults = {
  */
 module.exports = function() {
 
-	return function( serial, port ) {
+	return function( serial ) {
 
 		const app = this;
 
@@ -57,12 +57,12 @@ module.exports = function() {
 			// if type of data isn't find in the permitted list of type
 			if( !defaults.types[ data.type ] ) {
 
-				app.service( '/logs' ).create( { type: 'warning', message: `port ${port.name} has received data but could not find a type match` } );
+				app.service( '/logs' ).create( { type: 'warning', message: `port has received data but could not find a type match` } );
 				return;
 
 			}
 
-			app.service( '/logs' ).create( { message: `port ${port.name} has received properly formatted data of type ${defaults.types[ data.type ]}` } );
+			app.service( '/logs' ).create( { message: `port has received properly formatted data of type ${defaults.types[ data.type ]}` } );
 			return true;
 
 		}
@@ -109,7 +109,7 @@ module.exports = function() {
 		 *
 		 * @author shad
 		 */
-		const _recordNewData = function( port, data, hardware ) {
+		const _recordNewData = function( data, hardware ) {
 
 			// get the service on which to save the new record
 			const service = defaults.services[ data.type ];
@@ -126,7 +126,7 @@ module.exports = function() {
 			.create( values )
 			.then( res => {
 
-				app.service( '/logs' ).create( { message: `port ${port.name} has recorded new data on: ${hardware.name}` } );
+				app.service( '/logs' ).create( { message: `port has recorded new data on: ${hardware.name}` } );
 
 			} )
 			.catch( console.error );
@@ -141,7 +141,7 @@ module.exports = function() {
 		 *
 		 * @author shad
 		 */
-		const _isJSON = function( str, port ) {
+		const _isJSON = function( str ) {
 
 			try {
 
@@ -152,7 +152,7 @@ module.exports = function() {
 
 			catch (e) {
 
-				app.service( '/logs' ).create( { type: 'error', message: `port ${port.name} has failed to parse JSON data: ${str}` } );
+				app.service( '/logs' ).create( { type: 'error', message: `port has failed to parse JSON data: ${str}` } );
 
 				return false;
 
@@ -163,11 +163,11 @@ module.exports = function() {
 
 		serial.on( 'data', raw_data => {
 
-			app.service( '/logs' ).create( { message: `port ${port.name} is receiving data: ${raw_data}` } );
+			app.service( '/logs' ).create( { message: `port is receiving data: ${raw_data}` } );
 
 			// test received data is actually a valid JSON while
 			// parsing and returning the parsed result or false
-			const data = _isJSON( raw_data, port );
+			const data = _isJSON( raw_data );
 
 			if ( data ) {
 
@@ -189,7 +189,7 @@ module.exports = function() {
 
 						// record the new data linked to the hardware found
 						app.service( '/logs' ).create( { message: `found the hardware identifier requested: ${hardware.name}` } );
-						_recordNewData( port, data, hardware );
+						_recordNewData( data, hardware );
 
 					} );
 

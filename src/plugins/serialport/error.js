@@ -16,14 +16,14 @@ module.exports = function() {
 		serial.on( 'error', err => {
 
 			// log
-			app.service( '/logs' ).create( { message: `port ${port.name} connection error: ${err}` } );
+			app.service( '/logs' ).create( { message: `port connection error: ${err}` } );
 
 		} );
 
 		serial.on( 'disconnect', message =>  {
 
 			// log
-			app.service( '/logs' ).create( { message: `port ${port.name} disconnected: ${message}` } );
+			app.service( '/logs' ).create( { message: `port disconnected: ${message}` } );
 
 		} );
 

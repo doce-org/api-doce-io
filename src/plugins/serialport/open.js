@@ -19,12 +19,12 @@ module.exports = function() {
 
 			if( err ) {
 
-				app.service( '/logs' ).create( { message: `port ${port.name} opening error: ${err}` } );
+				app.service( '/logs' ).create( { message: `port opening error: ${err}` } );
 				throw new errors.BadRequest( err );
 
 			}
 
-			app.service( '/logs' ).create( { message: `port open: ${port.name}` } );
+			app.service( '/logs' ).create( { message: `port open` } );
 			// TODO set connection has active
 
 		} );

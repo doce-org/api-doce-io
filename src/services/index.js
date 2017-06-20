@@ -2,8 +2,6 @@
 
 const knex = require( 'knex' );
 // ports
-const port = require( './port' );
-const portList = require( './port_list' );
 const connection = require( './connection' );
 // hardwares
 const hardware = require( './hardware' );
@@ -27,8 +25,6 @@ module.exports = function () {
     app.set( 'knex', knex_connection );
 
     // base
-    app.configure( port );
-    app.configure( portList );
     app.configure( connection );
 
 	// hardware

@@ -18,7 +18,7 @@ module.exports = function() {
 		serial.on( 'close', () => {
 
 			// log
-			app.service( '/logs' ).create( { message: `port ${port.name} connection has been closed` } );
+			app.service( '/logs' ).create( { message: `port connection has been closed` } );
 
 		} );
 
