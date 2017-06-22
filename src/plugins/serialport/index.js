@@ -53,6 +53,6 @@ module.exports = function() {
 
 	}
 
-	app.set( 'serialPort', handleSerial );
+	app.set( 'serialPort', serialFunctions );
 
 }

@@ -25,7 +25,9 @@ exports.down = function( knex, Promise ) {
 
 	return Promise.all( [
 
-        knex.schema.table( 'hardwares' ).dropColumn( 'room_id' ),
+        knex.schema.table( 'hardwares', table=> {
+			table.dropColumn( 'room_id' )
+		} ),
 		knex.schema.dropTable( 'rooms' )
 
 	] )

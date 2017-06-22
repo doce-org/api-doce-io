@@ -45,8 +45,8 @@ exports.down = function( knex, Promise ) {
 
         knex.schema.dropTable( 'temperatures_sensors_records' ),
         knex.schema.dropTable( 'humidities_sensors_records' ),
-        knex.schema.dropTable( 'powers_gauges_records' ),
-        knex.schema.dropTable( 'waters_gauges_records' )
+        knex.schema.dropTable( 'powers_meters_records' ),
+        knex.schema.dropTable( 'waters_meters_records' )
 
     ] );
 

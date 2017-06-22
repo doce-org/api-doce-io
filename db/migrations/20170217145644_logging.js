@@ -19,7 +19,7 @@ exports.down = function( knex, Promise ) {
 
     return Promise.all( [
 
-        knex.schema.dropTable( 'logging' )
+        knex.schema.dropTable( 'logs' )
 
     ] );
 

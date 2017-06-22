@@ -30,6 +30,7 @@
     "body-parser": "^1.15.1",
     "compression": "^1.6.2",
     "cors": "^2.7.1",
+    "cron": "^1.2.1",
     "debug": "^2.2.0",
     "feathers": "^2.0.1",
     "feathers-configuration": "^0.2.3",
