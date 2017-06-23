@@ -1,18 +1,15 @@
 'use strict';
 
 const service = require( './connection.service.extend' );
+const memory = require('feathers-memory');
 const hooks = require( './hooks' );
 
 module.exports = function () {
+
     const app = this;
 
-    const options = {
-        Model: app.get( 'knex' ),
-        name: 'connections'
-    };
-
     // Initialize our service with any options it requires
-    app.use( '/connections', service( options ) );
+    app.use( '/connections', memory() );
 
     const connectionService = app.service( '/connections' );
     connectionService.before( hooks.before );

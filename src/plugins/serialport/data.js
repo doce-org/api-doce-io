@@ -33,7 +33,6 @@ const defaults = {
  * handle receiving data from an open connection
  *
  * @param {Object} serial
- * @param {Object} port
  *
  * @return {Function}
  *
@@ -52,7 +51,7 @@ module.exports = function() {
 		 *
 		 * @author shad
 		 */
-		const _checkDataValidity = function( data ) {
+		const _dataIsValid = function( data ) {
 
 			// if type of data isn't find in the permitted list of type
 			if( !defaults.types[ data.type ] ) {
@@ -101,7 +100,6 @@ module.exports = function() {
 		/**
 		 * record new data in specified service
 		 *
-		 * @param {Object} port
 		 * @param {Array} data
 		 * @param {Object} hardware
 		 *
@@ -137,7 +135,6 @@ module.exports = function() {
 		 * check if the received data is a proper JSON
 		 *
 		 * @param  {String}  str
-		 * @param {Object} port
 		 *
 		 * @author shad
 		 */
@@ -160,6 +157,55 @@ module.exports = function() {
 
 		}
 
+		/**
+		 * check if the received data is a setup data
+		 * 
+		 * @param {String} data
+		 * 
+		 * @return {Boolean}
+		 * 
+		 * @author shad
+		 */
+		const _isSetupData = function( data ) {
+
+			// check if the setup boolean is there
+			if ( data.setup ) {
+
+				app.service( '/logs' ).create( { message: `port has received setup data: ${data}` } );
+				return true;
+
+			}
+
+			return;
+			
+		}
+
+		/**
+		 * check if the system is currently in setup mode
+		 * 
+		 * @return {Boolean}
+		 * 
+		 * @author shad
+		 */
+		const _isInSetupMode = function() {
+
+
+
+		}
+
+		/**
+		 * set a temporary setup data for a hardware to be registered
+		 * 
+		 * @param {String} str
+		 * 
+		 * @author shad
+		 */
+		const _setSetupData = function( str ) {
+
+			app.service( '/logs' ).create( { message: `port has successfully set setup data: ${str}` } );
+
+		}
+
 
 		serial.on( 'data', raw_data => {
 
@@ -171,10 +217,13 @@ module.exports = function() {
 
 			if ( data ) {
 
-				// check data validity so we don't record malformed data
-				const data_is_valid = _checkDataValidity( data );
+				if ( _isSetupData( data ) ) {
 
-				if ( data_is_valid ) {
+
+
+				}
+
+				else if ( _dataIsValid( data ) ) {
 
 					// find the requested hardware based on a given identifier and the type of the record
 					_findHardwarePk( data ).then( hardware => {
