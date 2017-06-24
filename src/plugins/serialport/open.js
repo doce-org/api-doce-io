@@ -25,11 +25,12 @@ module.exports = function() {
 			}
 
 			app.service( '/logs' ).create( { message: `port open` } );
-			// TODO set connection has active
+			
+			// set connection to active
+			app.service( '/connection' ).create( { port: '/dev/ttyUSB0', active: true } );
 
 		} );
 
 	}
-
 
 };

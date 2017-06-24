@@ -1,6 +1,5 @@
 'use strict';
 
-const service = require( './connection.service.extend' );
 const memory = require('feathers-memory');
 const hooks = require( './hooks' );
 
