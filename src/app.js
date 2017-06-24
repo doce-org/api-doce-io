@@ -12,7 +12,6 @@ const rest = require( 'feathers-rest' );
 const socketio = require( 'feathers-socketio' );
 const middleware = require( './middleware' );
 const services = require( './services' );
-const serial = require( './plugins/serialport' );
 const cron = require( './cron' );
 
 const app = feathers();
@@ -30,7 +29,6 @@ app.use( compress() )
     .configure( socketio() )
     .configure( services )
     .configure( middleware )
-    .configure( serial )
     .configure( cron );
 
 module.exports = app;
