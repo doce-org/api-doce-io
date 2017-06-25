@@ -1,6 +1,5 @@
 'use strict';
 
-const Service = require( 'feathers-knex' ).Service;
 const serialport = require( 'serialport' );
 
 /**
@@ -30,18 +29,11 @@ const defaults = {
 
 };
 
-// prepare the serial port
-// @type {SerialPort}
-const connection = new serialport.SerialPort( '/dev/ttyUSB0', {
-	baudrate: 115200,
-	parser: serialport.parsers.readline( '\r\n' )
-} );
-
-class ExtendedService extends Service {
+class Service {
 
     setup( app ) {
         this.app = app;
-        this.serial = connection;
+        this.serial = false;
     }
 
     /**
@@ -50,6 +42,12 @@ class ExtendedService extends Service {
      * @author shad
      */
     _onOpenSerialPort() {
+
+		// build the serial port connection
+		this.serial = new serialport.SerialPort( '/dev/ttyUSB0', {
+			baudrate: 115200,
+			parser: serialport.parsers.readline( '\r\n' )
+		} );
 
         this.serial.on( 'open', ( err ) => {
 
@@ -65,6 +63,60 @@ class ExtendedService extends Service {
 		} );
 
     }
+
+	/**
+	 * setup catching receiving data event on serial port connection
+	 * 
+	 * @author shad
+	 */
+	_onDataReceivedSerialPort() {
+
+		this.serial.on( 'data', raw_data => {
+
+			this.app.service( '/logs' ).create( { message: `port is receiving data: ${raw_data}` } );
+
+			// test received data is actually a valid JSON while
+			// parsing and returning the parsed result or false
+			const data = this._isJSON( raw_data );
+
+			if ( data ) {
+
+				// check if receiving setup data
+				if ( this._isSetupData( data ) ) {
+
+					this._setSetupData( data );
+
+				}
+
+				// otherwise, directly check if the received data is of
+				// a proper format to go on saving it in database
+				else if ( this._dataIsValid( data ) ) {
+
+					// find the requested hardware based on a given identifier and the type of the record
+					this._findHardwarePk( data ).then( hardware => {
+
+						// if none was found, no hardware of the requested identifier exist. exiting
+						if ( !hardware ) {
+
+							this.app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested hardware identifier. discarding` } );
+							return;
+
+						}
+
+						// record the new data linked to the hardware found
+						this.app.service( '/logs' ).create( { message: `found the hardware identifier requested: ${hardware.name}` } );
+						this._recordNewData( data, hardware );
+
+					} );
+
+				}
+
+			}
+
+
+		} );
+
+	}
 
     /**
      * setup catching error on serial port
@@ -242,19 +294,6 @@ class ExtendedService extends Service {
 	}
 
     /**
-	 * check if the system is currently in setup mode
-	 * 
-	 * @return {Boolean}
-	 * 
-	 * @author shad
-	 */
-	_isInSetupMode() {
-
-
-
-	}
-
-    /**
 	 * set a temporary setup data for a hardware to be registered
 	 * 
 	 * @param {String} str
@@ -277,10 +316,15 @@ class ExtendedService extends Service {
      */
     create() {
 
-        // set all events
-        this._onSerialPortError();
-        this._onSerialPortClosed();
-        this._onOpenSerialPort();
+		if ( !this.serial ) {
+
+			// set all events
+			this._onOpenSerialPort();
+			this._onSerialPortError();
+			this._onSerialPortClosed();
+			this._onDataReceivedSerialPort();
+
+		}
 
 		return Promise.resolve( {} );
 
@@ -305,6 +349,6 @@ class ExtendedService extends Service {
 
 }
 
-module.exports = function init( Model ) {
-  return new ExtendedService( Model );
+module.exports = function init() {
+  return new Service();
 };

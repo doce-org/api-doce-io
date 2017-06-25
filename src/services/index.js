@@ -2,7 +2,7 @@
 
 const knex = require( 'knex' );
 // ports
-const connection = require( './connection' );
+const serial = require( './serial' );
 // hardwares
 const hardware = require( './hardware' );
 // rooms
@@ -25,7 +25,7 @@ module.exports = function () {
     app.set( 'knex', knex_connection );
 
     // base
-    app.configure( connection );
+    app.configure( serial );
 
 	// hardware
 	app.configure( hardware );
