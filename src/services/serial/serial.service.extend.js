@@ -49,7 +49,7 @@ class Service {
 			parser: serialport.parsers.readline( '\r\n' )
 		} );
 
-        this.serial.on( 'open', ( err ) => {
+        this.serial.on( 'open', err => {
 
 			if( err ) {
 
