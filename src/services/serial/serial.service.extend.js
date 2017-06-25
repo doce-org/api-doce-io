@@ -311,10 +311,10 @@ class Service {
 		Promise.all( [
 
 			this.app.service( '/hardwares' ).find( query ),
-			this.app.service( '/setup/hardware' ).find( query )
+			this.app.service( '/setup/hardwares' ).find( query )
 
 		] )
-		.then( ( hardwares, setup_hardware ) => {
+		.then( ( hardwares, setup_hardwares ) => {
 
 			// if setup hardware has already been registered
 			if ( hardwares.length > 0 ) {
@@ -325,7 +325,7 @@ class Service {
 			}
 
 			// if setup hardware has already been set up for registering
-			if ( setup_hardware.length > 0 ) {
+			if ( setup_hardwares.length > 0 ) {
 
 				return this.app.service( '/logs' )
 					.create( { message: `setup data is an already ready to be registered hardware with id: ${data.identifier}` } );
