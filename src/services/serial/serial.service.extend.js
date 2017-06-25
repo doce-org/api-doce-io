@@ -296,13 +296,62 @@ class Service {
     /**
 	 * set a temporary setup data for a hardware to be registered
 	 * 
-	 * @param {String} str
+	 * @param {String} data
 	 * 
 	 * @author shad
 	 */
-	_setSetupData( str ) {
+	_setSetupData( data ) {
 
-		this.app.service( '/logs' ).create( { message: `port has successfully set setup data: ${str}` } );
+		const query = { query: {
+
+			identifier: data.identifier
+
+		} };
+
+		Promise.all( [
+
+			this.app.service( '/hardwares' ).find( query ),
+			this.app.service( '/setup/hardware' ).find( query )
+
+		] )
+		.then( ( hardwares, setup_hardware ) => {
+
+			// if setup hardware has already been registered
+			if ( hardwares.length > 0 ) {
+
+				return this.app.service( '/logs' )
+					.create( { message: `setup data is an already registered hardware with id: ${data.identifier}` } );
+
+			}
+
+			// if setup hardware has already been set up for registering
+			if ( setup_hardware.length > 0 ) {
+
+				return this.app.service( '/logs' )
+					.create( { message: `setup data is an already ready to be registered hardware with id: ${data.identifier}` } );
+
+			}
+
+			this.app.service( '/setup/hardwares' )
+			.create( { type: data.type, identifier: data.identifier } )
+			.then( () => {
+
+				this.app.service( '/logs' ).create( { message: `port has successfully set setup data with ID: ${data.identifier}` } );
+
+			} )
+			.catch( err => {
+
+				this.app.service( '/logs' ).create( { type: 'error', message: `error while adding a new hardware to be setup: ${err}` } );
+
+			} );
+
+		} )
+		.catch( err => {
+
+			this.app.service( '/logs' ).create( { type: 'error', message: `error while setting setup data: ${err}`} );
+
+		} );
+
 
 	}
 
