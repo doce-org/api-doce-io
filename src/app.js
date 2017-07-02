@@ -12,6 +12,7 @@ const rest = require( 'feathers-rest' );
 const socketio = require( 'feathers-socketio' );
 const middleware = require( './middleware' );
 const services = require( './services' );
+const setup = require( './setup' );
 const cron = require( './cron' );
 
 const app = feathers();
@@ -28,6 +29,7 @@ app.use( compress() )
     .configure( rest() )
     .configure( socketio() )
     .configure( services )
+    .configure( setup )
     .configure( middleware )
     .configure( cron );
 

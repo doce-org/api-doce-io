@@ -14,10 +14,10 @@ const serialport = require( 'serialport' );
 const defaults = {
 
 	services: {
-		'TEMP': '/temperatures/sensors/records',
-		'HUMIDITY': '/humidities/sensors/records',
-		'POWER': '/powers/meters/records',
-		'WATER': '/waters/meters/records'
+		'TEMP': '/transmitters/temperatures/sensors/records',
+		'HUMIDITY': '/transmitters/humidities/sensors/records',
+		'POWER': '/transmitters/powers/meters/records',
+		'WATER': '/transmitters/waters/meters/records'
 	},
 
 	types: {
@@ -92,20 +92,20 @@ class Service {
 				// a proper format to go on saving it in database
 				else if ( this._dataIsValid( data ) ) {
 
-					// find the requested hardware based on a given identifier and the type of the record
-					this._findHardwarePk( data ).then( hardware => {
+					// find the requested transmitter based on a given identifier and the type of the record
+					this._findTransmitterPk( data ).then( transmitter => {
 
-						// if none was found, no hardware of the requested identifier exist. exiting
-						if ( !hardware ) {
+						// if none was found, no transmitter of the requested identifier exist. exiting
+						if ( !transmitter ) {
 
-							this.app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested hardware identifier. discarding` } );
+							this.app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested transmitter identifier. discarding` } );
 							return;
 
 						}
 
-						// record the new data linked to the hardware found
-						this.app.service( '/logs' ).create( { message: `found the hardware identifier requested: ${hardware.name}` } );
-						this._recordNewData( data, hardware );
+						// record the new data linked to the transmitter found
+						this.app.service( '/logs' ).create( { message: `found the transmitter identifier requested: ${transmitter.name}` } );
+						this._recordNewData( data, transmitter );
 
 					} );
 
@@ -180,7 +180,7 @@ class Service {
 	}
 
     /**
-	 * find hardware by ID
+	 * find transmitter by ID
 	 *
 	 * @param {integer} data
 	 *
@@ -190,12 +190,12 @@ class Service {
 	 *
 	 * @author shad
 	 */
-	_findHardwarePk( data ) {
+	_findTransmitterPk( data ) {
 
 		// prepare the request query
 		const query = { query: {
 
-			// find the hardware id
+			// find the transmitter id
 			'identifier': data.identifier,
 
 			// type has to be the one requested
@@ -203,7 +203,7 @@ class Service {
 
 		} };
 
-		return this.app.service( '/hardwares' )
+		return this.app.service( '/transmitters' )
 		.find( query )
 		.then( results => results.length > 0 && results[ 0 ] )
 		.catch( console.error );
@@ -214,30 +214,30 @@ class Service {
 	 * record new data in specified service
 	 *
 	 * @param {Array} data
-	 * @param {Object} hardware
+	 * @param {Object} transmitter
 	 *
 	 * @private
 	 *
 	 * @author shad
 	 */
-	_recordNewData( data, hardware ) {
+	_recordNewData( data, transmitter ) {
 
 		// get the service on which to save the new record
 		const service = defaults.services[ data.type ];
 
 		// extract only the data to be recorded by removing the type and the
-		// hardware identifier which aren't needed, everything else has to be
+		// transmitter identifier which aren't needed, everything else has to be
 		// part of the requested service model ( temperature, power... )
 		let values = _.omit( data, [ 'type', 'identifier' ] );
 
-		// add to the required data the hardware id previously found in `_findHardwarePk`
-		values = Object.assign( {}, { hardware_id: hardware.id }, values );
+		// add to the required data the transmitter id previously found in `_findtransmitterPk`
+		values = Object.assign( {}, { transmitter_id: transmitter.id }, values );
 
 		return this.app.service( service )
 		.create( values )
 		.then( res => {
 
-			this.app.service( '/logs' ).create( { message: `port has recorded new data on: ${hardware.name}` } );
+			this.app.service( '/logs' ).create( { message: `port has recorded new data on: ${transmitter.name}` } );
 
 		} )
 		.catch( console.error );
@@ -294,7 +294,7 @@ class Service {
 	}
 
     /**
-	 * set a temporary setup data for a hardware to be registered
+	 * set a temporary setup data for a transmitter to be registered
 	 * 
 	 * @param {String} data
 	 * 
@@ -310,29 +310,29 @@ class Service {
 
 		Promise.all( [
 
-			this.app.service( '/hardwares' ).find( query ),
-			this.app.service( '/setup/hardwares' ).find( query )
+			this.app.service( '/transmitters' ).find( query ),
+			this.app.service( '/setup/transmitters' ).find( query )
 
 		] )
-		.then( ( hardwares, setup_hardwares ) => {
+		.then( ( transmitters, setup_transmitters ) => {
 
-			// if setup hardware has already been registered
-			if ( hardwares.length > 0 ) {
+			// if setup transmitter has already been registered
+			if ( transmitters.length > 0 ) {
 
 				return this.app.service( '/logs' )
-					.create( { message: `setup data is an already registered hardware with id: ${data.identifier}` } );
+					.create( { message: `setup data is an already registered transmitter with id: ${data.identifier}` } );
 
 			}
 
-			// if setup hardware has already been set up for registering
-			if ( setup_hardwares.length > 0 ) {
+			// if setup transmitter has already been set up for registering
+			if ( setup_transmitters.length > 0 ) {
 
 				return this.app.service( '/logs' )
-					.create( { message: `setup data is an already ready to be registered hardware with id: ${data.identifier}` } );
+					.create( { message: `setup data is an already ready to be registered transmitter with id: ${data.identifier}` } );
 
 			}
 
-			this.app.service( '/setup/hardwares' )
+			this.app.service( '/setup/transmitters' )
 			.create( { type: data.type, identifier: data.identifier } )
 			.then( () => {
 
@@ -341,7 +341,7 @@ class Service {
 			} )
 			.catch( err => {
 
-				this.app.service( '/logs' ).create( { type: 'error', message: `error while adding a new hardware to be setup: ${err}` } );
+				this.app.service( '/logs' ).create( { type: 'error', message: `error while adding a new transmitter to be setup: ${err}` } );
 
 			} );
 
@@ -399,5 +399,5 @@ class Service {
 }
 
 module.exports = function init() {
-  return new Service();
+  	return new Service();
 };

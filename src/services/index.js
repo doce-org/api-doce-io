@@ -3,16 +3,16 @@
 const knex = require( 'knex' );
 // ports
 const serial = require( './serial' );
-const setupHardware = require( './setup_hardware' );
-// hardwares
-const hardware = require( './hardware' );
 // rooms
 const room = require( './room' );
-// sensors
-const temperatureSensorRecord = require( './temperature_sensor_record' );
-const humiditySensorRecord = require( './humidity_sensor_record' );
-const powerMeterRecord = require( './power_meter_record' );
-const waterMeterRecord = require( './water_meter_record' );
+// transmitters
+const transmitter = require( './transmitter' );
+const transmitterTemperatureRecord = require( './transmitter_temperature_record' );
+const transmitterTemperatureAverage = require( './transmitter_temperature_avg' );
+const transmitterHumidityRecord = require( './transmitter_humidity_record' );
+const transmitterHumidityAverage = require( './transmitter_humidity_avg' );
+const transmitterPowerRecord = require( './transmitter_power_record' );
+const transmitterWaterRecord = require( './transmitter_water_record' );
 // others
 const log = require( './log' );
 
@@ -27,19 +27,18 @@ module.exports = function () {
 
     // base
     app.configure( serial );
-    app.configure( setupHardware );
-
-	// hardware
-	app.configure( hardware );
-
-	// room
+	
+    // room
     app.configure( room );
 
-    // hardware
-    app.configure( temperatureSensorRecord );
-    app.configure( humiditySensorRecord );
-    app.configure( powerMeterRecord );
-    app.configure( waterMeterRecord );
+	// transmitters
+	app.configure( transmitter );
+    app.configure( transmitterTemperatureAverage );
+    app.configure( transmitterTemperatureRecord );
+    app.configure( transmitterHumidityAverage );
+    app.configure( transmitterHumidityRecord );
+    app.configure( transmitterPowerRecord );
+    app.configure( transmitterWaterRecord );
 
 	// others
 	app.configure( log );
