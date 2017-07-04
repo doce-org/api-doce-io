@@ -1,6 +1,7 @@
 'use strict';
 
 const serialport = require( 'serialport' );
+const _ = require( 'lodash' );
 
 /**
  * defaults
@@ -14,10 +15,10 @@ const serialport = require( 'serialport' );
 const defaults = {
 
 	services: {
-		'TEMP': '/transmitters/temperatures/sensors/records',
-		'HUMIDITY': '/transmitters/humidities/sensors/records',
-		'POWER': '/transmitters/powers/meters/records',
-		'WATER': '/transmitters/waters/meters/records'
+		'TEMP': '/transmitters/temperatures/records',
+		'HUMIDITY': '/transmitters/humidities/records',
+		'POWER': '/transmitters/powers/records',
+		'WATER': '/transmitters/waters/records'
 	},
 
 	types: {
@@ -199,7 +200,7 @@ class Service {
 			'identifier': data.identifier,
 
 			// type has to be the one requested
-			'type': defaults.types[ data.type ]
+			'type': data.type
 
 		} };
 
@@ -314,7 +315,7 @@ class Service {
 			this.app.service( '/setup/transmitters' ).find( query )
 
 		] )
-		.then( ( transmitters, setup_transmitters ) => {
+		.then( ( [ transmitters, setup_transmitters ] ) => {
 
 			// if setup transmitter has already been registered
 			if ( transmitters.length > 0 ) {
@@ -365,15 +366,11 @@ class Service {
      */
     create() {
 
-		if ( !this.serial ) {
-
-			// set all events
-			this._onOpenSerialPort();
-			this._onSerialPortError();
-			this._onSerialPortClosed();
-			this._onDataReceivedSerialPort();
-
-		}
+		// set all events
+		this._onOpenSerialPort();
+		this._onSerialPortError();
+		this._onSerialPortClosed();
+		this._onDataReceivedSerialPort();
 
 		return Promise.resolve( {} );
 
