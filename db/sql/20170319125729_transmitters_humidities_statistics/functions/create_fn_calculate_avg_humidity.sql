@@ -10,17 +10,17 @@ AS $$
 BEGIN
 
 --  insert the average
-    INSERT INTO transmitters_humidities_avg
+    INSERT INTO transmitters_humidities_avg( "transmitter_id", "avg_humidity", "avg_temperature", "type", "created_at" )
     SELECT 
-        "transmitters_humiditires_records"."transmitter_id" AS transmitter_id,
-        AVG( "transmitters_humiditires_records"."humidity" ) AS avg_humidity,
-        AVG( "transmitters_humiditires_records"."temperature" ) AS avg_temperature,
+        "transmitters_humidities_records"."transmitter_id" AS transmitter_id,
+        AVG( "transmitters_humidities_records"."humidity" ) AS avg_humidity,
+        AVG( "transmitters_humidities_records"."temperature" ) AS avg_temperature,
         in_type AS type,
         NOW() AS created_at
-    FROM "transmitters_humiditires_records"
-    WHERE "transmitters_humiditires_records"."created_at" >= ( NOW() - in_interval )
-        AND "transmitters_humiditires_records"."created_at" <= NOW()
-    GROUP BY "transmitters_humiditires_records"."transmitter_id";
+    FROM "transmitters_humidities_records"
+    WHERE "transmitters_humidities_records"."created_at" >= ( NOW() - in_interval::INTERVAL )
+        AND "transmitters_humidities_records"."created_at" <= NOW()
+    GROUP BY "transmitters_humidities_records"."transmitter_id";
 
 END;
 $$
