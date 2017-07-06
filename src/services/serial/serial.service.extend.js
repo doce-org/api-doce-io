@@ -64,7 +64,7 @@ class Service {
     _onOpenSerialPort() {
 
 		// build the serial port connection
-		this.serial = new serialport.SerialPort( '/dev/ttyUSB0', {
+		this.serial = new serialport.SerialPort( '/dev/ttyACM0', {
 			baudrate: 115200,
 			parser: serialport.parsers.readline( '\r\n' )
 		} );
@@ -80,6 +80,11 @@ class Service {
 
 			this.emit( 'open', {} );
 			this.app.service( '/logs' ).create( { message: `port open` } );
+
+			setTimeout( () => {
+				const buffer = new Buffer( "{\"type\":\"write\",\"data\":\"test\"}", encoding='utf8' );
+				this.serial.write( buffer );
+			}, 25000 );
 
 		} );
 

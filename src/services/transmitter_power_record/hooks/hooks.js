@@ -38,7 +38,8 @@ exports.convertData = function() {
 
 			} };
 
-        	hook.app.service( '/powers/meters/records' )
+
+        	hook.app.service( '/transmitters/powers/records' )
 			.find( query )
         	.then( records => {
 
@@ -47,14 +48,14 @@ exports.convertData = function() {
 
         			const record = records[ 0 ];
 
-					// get the difference in minutes between the last record on the current time
-        			const diff = now.diff( record.created_at, 'minutes' );
+					// get the difference in seconds between the last record and the current time
+        			const diff = now.diff( record.created_at, 'seconds' );
 
 					// if we have a difference inferior to 20 minutes, calculate
 					// the real power used on this timespan
-        			if( diff < 20 ) {
+        			if( diff < 1200 ) {
 						
-        				hook.data.power = +hook.data.energy / ( diff / 60 );
+        				hook.data.power = +hook.data.pulse / ( diff / 3600 );
 						
         			}
 

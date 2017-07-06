@@ -32,7 +32,7 @@ exports.up = function( knex, Promise ) {
 			table.increments( 'id' ).primary();
 			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' );
 			table.decimal( 'power' ).notNullable().defaultTo( 0 );
-			table.integer( 'energy' ).notNullable();
+			table.integer( 'pulse' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
