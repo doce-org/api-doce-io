@@ -32,6 +32,25 @@ const defaults = {
 
 class Service {
 
+	/**
+	 * override constructor
+	 * 
+	 * @override
+	 * 
+	 * @author shad
+	 */
+	constructor() {
+		// setup available events
+		this.events = [ 'open', 'closed' ];
+	}
+
+	/**
+	 * base setup for service
+	 * 
+	 * @override
+	 * 
+	 * @author shad
+	 */
     setup( app ) {
         this.app = app;
         this.serial = false;
@@ -59,7 +78,56 @@ class Service {
 
 			}
 
+			this.emit( 'open', {} );
 			this.app.service( '/logs' ).create( { message: `port open` } );
+
+		} );
+
+    }
+
+	/**
+     * setup catching error on serial port
+     * 
+     * @author shad
+     */
+    _onSerialPortError() {
+
+        this.serial.on( 'error', err => {
+
+			// log
+			this.app.service( '/logs' ).create( { type: 'error', message: `port connection error: ${err}` } );
+
+			// event
+			this.emit( 'closed', { error: err } );
+
+		} );
+
+		this.serial.on( 'disconnect', message =>  {
+
+			// log
+			this.app.service( '/logs' ).create( { type: 'warning', message: `port disconnected: ${message}` } );
+
+			// event
+			this.emit( 'closed', { message: message } );
+
+		} );
+
+    }
+
+	/**
+     * setup catching closing serial port connection
+     * 
+     * @author shad
+     */
+    _onSerialPortClosed() {
+
+        this.serial.on( 'close', () => {
+
+			// log
+			this.app.service( '/logs' ).create( { message: `port connection has been closed` } );
+
+			// event
+			this.emit( 'closed', {} );
 
 		} );
 
@@ -118,45 +186,6 @@ class Service {
 		} );
 
 	}
-
-    /**
-     * setup catching error on serial port
-     * 
-     * @author shad
-     */
-    _onSerialPortError() {
-
-        this.serial.on( 'error', err => {
-
-			// log
-			this.app.service( '/logs' ).create( { message: `port connection error: ${err}` } );
-
-		} );
-
-		this.serial.on( 'disconnect', message =>  {
-
-			// log
-			this.app.service( '/logs' ).create( { message: `port disconnected: ${message}` } );
-
-		} );
-
-    }
-
-    /**
-     * setup catching closing serial port connection
-     * 
-     * @author shad
-     */
-    _onSerialPortClosed() {
-
-        this.serial.on( 'close', () => {
-
-			// log
-			this.app.service( '/logs' ).create( { message: `port connection has been closed` } );
-
-		} );
-
-    }
 
     /**
 	 * check data validity
@@ -353,6 +382,20 @@ class Service {
 
 		} );
 
+
+	}
+
+	/**
+	 * override the find method to return the serial, if any available
+	 * will return the current status of the serial connection
+	 * 
+	 * @override
+	 * 
+	 * @author shad
+	 */
+	find() {
+
+		return Promise.resolve( { is_open: this.serial && this.serial.isOpen() } );
 
 	}
 
