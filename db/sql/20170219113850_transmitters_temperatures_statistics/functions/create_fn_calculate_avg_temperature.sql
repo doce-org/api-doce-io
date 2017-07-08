@@ -9,7 +9,7 @@ AS $$
 <<baseblock>>
 BEGIN
 
---  insert the average
+--  insert the average from the temperatures records
     INSERT INTO transmitters_temperatures_avg( "transmitter_id", "avg_temperature", "type", "created_at" )
     SELECT 
         "transmitters_temperatures_records"."transmitter_id" AS transmitter_id,
@@ -20,6 +20,18 @@ BEGIN
     WHERE "transmitters_temperatures_records"."created_at" >= ( NOW() - in_interval::INTERVAL )
         AND "transmitters_temperatures_records"."created_at" <= NOW()
     GROUP BY "transmitters_temperatures_records"."transmitter_id";
+
+--  insert the average from the humidities records who also contains temperatures
+    INSERT INTO transmitters_temperatures_avg( "transmitter_id", "avg_temperature", "type", "created_at" )
+    SELECT 
+        "transmitters_humidities_records"."transmitter_id" AS transmitter_id,
+        AVG( "transmitters_humidities_records"."temperature" ) AS avg_temperature,
+        in_type AS type,
+        NOW() AS created_at
+    FROM "transmitters_humidities_records"
+    WHERE "transmitters_humidities_records"."created_at" >= ( NOW() - in_interval::INTERVAL )
+        AND "transmitters_humidities_records"."created_at" <= NOW()
+    GROUP BY "transmitters_humidities_records"."transmitter_id";
 
 END;
 $$
