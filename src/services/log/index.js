@@ -18,4 +18,13 @@ module.exports = function () {
     logService.before( hooks.before );
     logService.after( hooks.after );
 
+    // set a globally accessible function to log messages
+    app.set( 'log', ( message, type = 'info' ) => {
+
+        app
+		.service( '/logs' )
+		.create( { type, message } );
+
+    } );
+
 };

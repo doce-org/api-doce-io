@@ -40,8 +40,10 @@ class Service {
 	 * @author shad
 	 */
 	constructor() {
+
 		// setup available events
 		this.events = [ 'open', 'closed' ];
+
 	}
 
 	/**
@@ -53,8 +55,23 @@ class Service {
 	 */
     setup( app ) {
         this.app = app;
+		this.log = app.get( 'log' );
         this.serial = false;
     }
+
+	/**
+	 * override the find method to return the serial, if any available
+	 * will return the current status of the serial connection
+	 * 
+	 * @override
+	 * 
+	 * @author shad
+	 */
+	find() {
+
+		return Promise.resolve( { is_open: this.serial && this.serial.isOpen() } );
+
+	}
 
     /**
      * setup catching open event on serial port connection
@@ -63,28 +80,56 @@ class Service {
      */
     _onOpenSerialPort() {
 
-		// build the serial port connection
-		this.serial = new serialport.SerialPort( '/dev/ttyACM0', {
-			baudrate: 115200,
-			parser: serialport.parsers.readline( '\r\n' )
-		} );
+		let port = false;
 
-        this.serial.on( 'open', err => {
+		// list available ports to make sure one of the required
+		// ones is available to open the serial connection
+		serialport.list( ( err, ports ) => {
 
-			if( err ) {
+			// search for a proper port
+			const com_names = ports.map( port => port.comName );
+			const port_idx = _.indexOf( com_names, '/dev/ttyUSB0', '/dev/ttyACM0' );
 
-				this.app.service( '/logs' ).create( { message: `port opening error: ${err}` } );
-				throw new errors.BadRequest( err );
+			// if none of the required port has been found
+			if ( port_idx === -1 ) {
+
+				this.log( 'could not find a port to open the serial connection', 'error' );
+				return;
 
 			}
 
-			this.emit( 'open', {} );
-			this.app.service( '/logs' ).create( { message: `port open` } );
+			// build the serial port connection
+			this.serial = new serialport.SerialPort( com_names[ port_idx ], {
+				baudrate: 115200,
+				parser: serialport.parsers.readline( '\r\n' )
+			} );
 
-			setTimeout( () => {
-				const buffer = new Buffer( "{\"type\":\"write\",\"data\":\"test\"}", encoding='utf8' );
-				this.serial.write( buffer );
-			}, 25000 );
+			// set other events support
+			this._onSerialPortError();
+			this._onSerialPortClosed();
+			this._onDataReceivedSerialPort();
+
+			this.serial.on( 'open', err => {
+
+				if( err ) {
+
+					this.log( `port opening error: ${err}`, 'error' );
+
+					throw new errors.BadRequest( err );
+
+				}
+
+				// emit open connection event
+				this.emit( 'open', {} );
+
+				this.log( 'port open', 'debug' );
+
+				// setTimeout( () => {
+				// 	const buffer = new Buffer( "{\"type\":\"write\",\"data\":\"test\"}", encoding='utf8' );
+				// 	this.serial.write( buffer );
+				// }, 25000 );
+
+			} );
 
 		} );
 
@@ -99,8 +144,7 @@ class Service {
 
         this.serial.on( 'error', err => {
 
-			// log
-			this.app.service( '/logs' ).create( { type: 'error', message: `port connection error: ${err}` } );
+			this.log( `port connection error: ${err}`, 'error' );
 
 			// event
 			this.emit( 'closed', { error: err } );
@@ -109,8 +153,7 @@ class Service {
 
 		this.serial.on( 'disconnect', message =>  {
 
-			// log
-			this.app.service( '/logs' ).create( { type: 'warning', message: `port disconnected: ${message}` } );
+			this.log( `port disconnected: ${message}`, 'warning' );
 
 			// event
 			this.emit( 'closed', { message: message } );
@@ -128,8 +171,7 @@ class Service {
 
         this.serial.on( 'close', () => {
 
-			// log
-			this.app.service( '/logs' ).create( { message: `port connection has been closed` } );
+			this.log( 'port connection has been closed', 'debug' );
 
 			// event
 			this.emit( 'closed', {} );
@@ -147,7 +189,7 @@ class Service {
 
 		this.serial.on( 'data', raw_data => {
 
-			this.app.service( '/logs' ).create( { message: `port is receiving data: ${raw_data}` } );
+			this.log( `port is receiving data: ${raw_data.toString()}`, 'debug' );
 
 			// test received data is actually a valid JSON while
 			// parsing and returning the parsed result or false
@@ -155,16 +197,26 @@ class Service {
 
 			if ( data ) {
 
-				// check if receiving setup data
-				if ( this._isSetupData( data ) ) {
+				// check if the setup boolean is there
+				if ( data.setup ) {
 
+					this.log( `port has received SETUP data`, 'debug' );
+					
 					this._setSetupData( data );
 
 				}
 
-				// otherwise, directly check if the received data is of
-				// a proper format to go on saving it in database
-				else if ( this._dataIsValid( data ) ) {
+				else {
+
+					// if type of data isn't find in the permitted list of type
+					if( !defaults.types[ data.type ] ) {
+
+						this.log( `port has received data but could not find a type match`, 'warning' );
+						return;
+
+					}
+
+					this.log( `port has received a proper type data: ${defaults.types[ data.type ]}`, 'debug' );
 
 					// find the requested transmitter based on a given identifier and the type of the record
 					this._findTransmitterPk( data ).then( transmitter => {
@@ -172,13 +224,14 @@ class Service {
 						// if none was found, no transmitter of the requested identifier exist. exiting
 						if ( !transmitter ) {
 
-							this.app.service( '/logs' ).create( { type: 'warning', message: `could not find the requested transmitter identifier. discarding` } );
+							this.log( `could not find the requested transmitter identifier`, 'warning' );
+
 							return;
 
 						}
 
-						// record the new data linked to the transmitter found
-						this.app.service( '/logs' ).create( { message: `found the transmitter identifier requested: ${transmitter.name}` } );
+						this.log( `found the transmitter identifier requested: ${transmitter.name}`, 'debug' );
+
 						this._recordNewData( data, transmitter );
 
 					} );
@@ -193,31 +246,9 @@ class Service {
 	}
 
     /**
-	 * check data validity
-	 *
-	 * @param {Array} data
-	 *
-	 * @author shad
-     */
-	_dataIsValid( data ) {
-
-		// if type of data isn't find in the permitted list of type
-		if( !defaults.types[ data.type ] ) {
-
-			this.app.service( '/logs' ).create( { type: 'warning', message: `port has received data but could not find a type match` } );
-			return;
-
-		}
-
-		this.app.service( '/logs' ).create( { message: `port has received properly formatted data of type ${defaults.types[ data.type ]}` } );
-		return true;
-
-	}
-
-    /**
 	 * find transmitter by ID
 	 *
-	 * @param {integer} data
+	 * @param {Integer} data
 	 *
      * @return {Promise}
 	 *
@@ -270,11 +301,6 @@ class Service {
 
 		return this.app.service( service )
 		.create( values )
-		.then( res => {
-
-			this.app.service( '/logs' ).create( { message: `port has recorded new data on: ${transmitter.name}` } );
-
-		} )
 		.catch( console.error );
 
 	}
@@ -297,35 +323,11 @@ class Service {
 
 		catch (e) {
 
-			this.app.service( '/logs' ).create( { type: 'error', message: `port has failed to parse JSON data: ${str}` } );
-
+			this.log( `port has failed to parse JSON data: ${str}`, 'error' );
 			return false;
 
 		}
 
-	}
-
-    /**
-	 * check if the received data is a setup data
-	 * 
-	 * @param {String} data
-	 * 
-	 * @return {Boolean}
-	 * 
-	 * @author shad
-	 */
-	_isSetupData( data ) {
-
-		// check if the setup boolean is there
-		if ( data.setup ) {
-
-			this.app.service( '/logs' ).create( { message: `port has received setup data: ${data}` } );
-			return true;
-
-		}
-
-		return;
-			
 	}
 
     /**
@@ -354,53 +356,33 @@ class Service {
 			// if setup transmitter has already been registered
 			if ( transmitters.length > 0 ) {
 
-				return this.app.service( '/logs' )
-					.create( { message: `setup data is an already registered transmitter with id: ${data.identifier}` } );
+				return this.log( `setup data is an already registered transmitter with id: ${data.identifier}`, 'debug' );
 
 			}
 
 			// if setup transmitter has already been set up for registering
 			if ( setup_transmitters.length > 0 ) {
 
-				return this.app.service( '/logs' )
-					.create( { message: `setup data is an already ready to be registered transmitter with id: ${data.identifier}` } );
+				return this.log( `setup data is an already ready to be registered transmitter with id: ${data.identifier}`, 'debug' );
 
 			}
 
-			this.app.service( '/setup/transmitters' )
+			this.app
+			.service( '/setup/transmitters' )
 			.create( { type: data.type, identifier: data.identifier } )
-			.then( () => {
-
-				this.app.service( '/logs' ).create( { message: `port has successfully set setup data with ID: ${data.identifier}` } );
-
-			} )
 			.catch( err => {
 
-				this.app.service( '/logs' ).create( { type: 'error', message: `error while adding a new transmitter to be setup: ${err}` } );
+				this.log( `error while adding a new transmitter to be setup: ${err}`, 'error' );
 
 			} );
 
 		} )
 		.catch( err => {
 
-			this.app.service( '/logs' ).create( { type: 'error', message: `error while setting setup data: ${err}`} );
+			this.log( `error while setting setup data: ${err}`, 'error' );
 
 		} );
 
-
-	}
-
-	/**
-	 * override the find method to return the serial, if any available
-	 * will return the current status of the serial connection
-	 * 
-	 * @override
-	 * 
-	 * @author shad
-	 */
-	find() {
-
-		return Promise.resolve( { is_open: this.serial && this.serial.isOpen() } );
 
 	}
 
@@ -414,11 +396,7 @@ class Service {
      */
     create() {
 
-		// set all events
 		this._onOpenSerialPort();
-		this._onSerialPortError();
-		this._onSerialPortClosed();
-		this._onDataReceivedSerialPort();
 
 		return Promise.resolve( {} );
 
