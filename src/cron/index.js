@@ -21,7 +21,7 @@ module.exports = function() {
         ] )
         .then( () => {
 
-            log( `insert new average values for day statistics (every 3 minutes) successfully` );
+            log( `insert new average values for day statistics (every 3 minutes) successfully`, 'debug' );
 
         } )
         .catch( err => {
@@ -43,7 +43,7 @@ module.exports = function() {
         ] )
         .then( () => {
 
-            log( `insert new average values for week statistics (every 10 minutes) successfully` );
+            log( `insert new average values for week statistics (every 10 minutes) successfully`, 'debug' );
 
         } )
         .catch( err => {
@@ -64,7 +64,7 @@ module.exports = function() {
         ] )
         .then( () => {
 
-            log( `insert new average values for month statistics (every day at 00:01am) successfully` );
+            log( `insert new average values for month statistics (every day at 00:01am) successfully`, 'debug' );
 
         } )
         .catch( err => {
@@ -85,7 +85,7 @@ module.exports = function() {
         ] )
         .then( () => {
 
-            log( `insert new average values for year statistics (every first day of the month at 00:01am) successfully` );
+            log( `insert new average values for year statistics (every first day of the month at 00:01am) successfully`, 'debug' );
 
         } )
         .catch( err => {
