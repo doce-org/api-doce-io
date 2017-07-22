@@ -88,8 +88,11 @@ class Service {
 
 			// search for a proper port
 			const com_names = ports.map( port => port.comName );
-			const port_idx = _.indexOf( com_names, com_name => 
-				com_name === '/dev/ttyUSB0' || com_name === '/dev/ttyACM0' );
+			const port_idx = _.findIndex( com_names, com_name => {
+
+				return com_name === '/dev/ttyUSB0' || com_name === '/dev/ttyACM0';
+
+			} );
 
 			// if none of the required port has been found
 			if ( port_idx === -1 ) {
@@ -124,6 +127,24 @@ class Service {
 				this.emit( 'open', {} );
 
 				this.log( 'port open', 'debug' );
+
+				// setInterval( () => {
+
+				// 	function getRandomArbitrary( min, max ) {
+				// 		return Math.random() * (max - min) + min;
+				// 	}
+				// 	const rand = getRandomArbitrary( 1, 180 );
+				// 	// console.log( Math.round( rand ).toString() );
+				// 	// this.serial.write( Math.round( rand ).toString() );
+				// 	const cmd = {
+				// 		type: 'CMD',
+				// 		identifier: '2A65DJ1IOI91J90',
+				// 		value: Math.round( rand ).toString()
+				// 	};
+				// 	console.log( JSON.stringify( cmd ) );
+				// 	this.serial.write( JSON.stringify( cmd ) );
+
+				// }, 10000 );
 
 			} );
 
@@ -382,17 +403,42 @@ class Service {
 
 	}
 
+	/**
+	 * send a message through the serial port
+	 * 
+	 * @param {Object} data
+	 * 
+	 * @author shad
+	 */
+	_onSendMessageThroughSerial( data ) {
+
+		const cmd = {
+			type: 'CMD',
+			identifier: '2A65DJ1IOI91J90',
+			value: data.value
+		};
+		console.log( JSON.stringify( cmd ) );
+		this.serial.write( JSON.stringify( cmd ) );
+
+	}
+
     /**
      * override the create service method to provide the
      * possibility to open the serial port connection
+	 * 
+	 * @param {Object} data
      * 
 	 * @override
      * 
 	 * @author shad
      */
-    create() {
+    create( data ) {
 
-		this._onOpenSerialPort();
+		// if 'open' command, open the serial port
+		if ( data.command === 'open' ) this._onOpenSerialPort();
+
+		// if 'send' command, prepare sending message to serial port
+		if ( data.command === 'send' ) this._onSendMessageThroughSerial( data );
 
 		return Promise.resolve( {} );
 

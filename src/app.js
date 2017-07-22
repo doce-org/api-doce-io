@@ -15,6 +15,7 @@ const services = require( './services' );
 const views = require( './views' );
 const setup = require( './setup' );
 const cron = require( './cron' );
+const init = require( './init' );
 
 const app = feathers();
 
@@ -33,6 +34,7 @@ app.use( compress() )
     .configure( setup )
     .configure( views )
     .configure( middleware )
-    .configure( cron );
+    .configure( cron )
+    .configure( init );
 
 module.exports = app;
