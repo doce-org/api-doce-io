@@ -88,7 +88,8 @@ class Service {
 
 			// search for a proper port
 			const com_names = ports.map( port => port.comName );
-			const port_idx = _.indexOf( com_names, '/dev/ttyUSB0', '/dev/ttyACM0' );
+			const port_idx = _.indexOf( com_names, com_name => 
+				com_name === '/dev/ttyUSB0' || com_name === '/dev/ttyACM0' );
 
 			// if none of the required port has been found
 			if ( port_idx === -1 ) {
@@ -100,7 +101,7 @@ class Service {
 
 			// build the serial port connection
 			this.serial = new serialport.SerialPort( com_names[ port_idx ], {
-				baudrate: 115200,
+				baudrate: 230400,
 				parser: serialport.parsers.readline( '\r\n' )
 			} );
 
@@ -123,11 +124,6 @@ class Service {
 				this.emit( 'open', {} );
 
 				this.log( 'port open', 'debug' );
-
-				// setTimeout( () => {
-				// 	const buffer = new Buffer( "{\"type\":\"write\",\"data\":\"test\"}", encoding='utf8' );
-				// 	this.serial.write( buffer );
-				// }, 25000 );
 
 			} );
 
