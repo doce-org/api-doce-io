@@ -1,6 +1,7 @@
 # Logs
 logs
 *.log
+.Trash-1000
 
 # idea
 .idea
