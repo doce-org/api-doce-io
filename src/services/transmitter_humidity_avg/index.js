@@ -8,7 +8,7 @@ module.exports = function () {
 
     const options = {
         Model: app.get( 'knex' ),
-        name: 'transmitters_humidities_averages'
+        name: 'transmitters_humidities_avg'
     };
 
     // Initialize our service with any options it requires

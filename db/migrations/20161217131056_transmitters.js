@@ -6,7 +6,7 @@ exports.up = function( knex, Promise ) {
 
         knex.schema.createTable( 'transmitters', table => {
 			table.increments( 'id' ).primary();
-            table.integer( 'room_id' ).notNullable().references( 'id' ).inTable( 'rooms' ).index();
+            table.integer( 'room_id' ).notNullable().references( 'id' ).inTable( 'rooms' ).index().onDelete( 'CASCADE' );
             table.string( 'identifier' ).notNullable();
 			table.string( 'type' ).notNullable();
             table.string( 'name' ).notNullable();
@@ -15,14 +15,14 @@ exports.up = function( knex, Promise ) {
 
         knex.schema.createTable( 'transmitters_temperatures_records', table => {
 			table.increments( 'id' ).primary();
-			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index();
+			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index().onDelete( 'CASCADE' );
 			table.decimal( 'temperature' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
 		knex.schema.createTable( 'transmitters_humidities_records', table => {
 			table.increments( 'id' ).primary();
-			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index();
+			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index().onDelete( 'CASCADE' );
 			table.decimal( 'temperature' ).notNullable();
 			table.decimal( 'humidity' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
@@ -30,7 +30,7 @@ exports.up = function( knex, Promise ) {
 
 		knex.schema.createTable( 'transmitters_powers_records', table => {
 			table.increments( 'id' ).primary();
-			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index();
+			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index().onDelete( 'CASCADE' );
 			table.decimal( 'power' ).notNullable().defaultTo( 0 );
 			table.integer( 'pulse' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
@@ -38,7 +38,7 @@ exports.up = function( knex, Promise ) {
 
 		knex.schema.createTable( 'transmitters_waters_records', table => {
 			table.increments( 'id' ).primary();
-			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index();
+			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).index().onDelete( 'CASCADE' );
 			table.decimal( 'water' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} )

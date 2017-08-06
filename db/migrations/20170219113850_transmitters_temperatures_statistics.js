@@ -12,7 +12,7 @@ exports.up = function( knex, Promise ) {
 
 		knex.schema.createTable( 'transmitters_temperatures_avg', table => {
 			table.increments( 'id' ).primary();
-			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' );
+			table.integer( 'transmitter_id' ).notNullable().references( 'id' ).inTable( 'transmitters' ).onDelete( 'CASCADE' );
 			table.decimal( 'avg_temperature' ).notNullable();
 			table.string( 'type' ).notNullable();
 			table.timestamp( 'created_at' ).notNullable();
