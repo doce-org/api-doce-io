@@ -24,7 +24,7 @@ const defaults = {
 	types: {
 		'TEMP': 'temperature',
 		'HUMIDITY': 'humidity',
-		'POWER': 'energy',
+		'POWER': 'power',
 		'WATER': 'water'
 	}
 

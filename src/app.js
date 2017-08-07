@@ -37,4 +37,7 @@ app.use( compress() )
     .configure( cron )
     .configure( init );
 
+// others config
+require( './config/postgres.config' );
+
 module.exports = app;
