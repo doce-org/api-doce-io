@@ -20,6 +20,7 @@ exports.up = function( knex, Promise ) {
 
 			table.index( 'transmitter_id' );
 			table.index( 'type' );
+			table.index( 'created_at' );
 		} ),
 
 		knex.schema.raw( create_fn_calculate_avg_humidity )

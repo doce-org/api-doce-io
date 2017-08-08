@@ -414,10 +414,12 @@ class Service {
 
 		const cmd = {
 			type: 'CMD',
-			identifier: '2A65DJ1IOI91J90',
+			identifier: data.identifier,
 			value: data.value
 		};
-		console.log( JSON.stringify( cmd ) );
+
+		this.log( `trying to send data to transmitter ${data.identifier}: ${data.value.toString()}` );
+		
 		this.serial.write( JSON.stringify( cmd ) );
 
 	}
