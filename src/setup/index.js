@@ -3,6 +3,8 @@
 const knex = require( 'knex' );
 // transmitters
 const setup_transmitter = require( './setup_transmitter' );
+// receivers
+const setup_receiver = require( './setup_receiver' );
 
 module.exports = function () {
     
@@ -10,5 +12,8 @@ module.exports = function () {
 
     // transmitters
     app.configure( setup_transmitter );
+
+    // receivers
+    app.configure( setup_receiver );
 
 };

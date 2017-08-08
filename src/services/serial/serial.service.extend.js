@@ -362,44 +362,92 @@ class Service {
 
 		} };
 
-		Promise.all( [
+		// if 'CMD' type, means we're receiving setup
+		// data for a receiver hardware
+		if ( data.type === 'CMD' ) {
 
-			this.app.service( '/transmitters' ).find( query ),
-			this.app.service( '/setup/transmitters' ).find( query )
+			Promise.all( [
 
-		] )
-		.then( ( [ transmitters, setup_transmitters ] ) => {
+				this.app.service( '/receivers' ).find( query ),
+				this.app.service( '/setup/receivers' ).find( query )
 
-			// if setup transmitter has already been registered
-			if ( transmitters.length > 0 ) {
+			] )
+			.then( ( [ receivers, setup_receivers ] ) => {
 
-				return this.log( `setup data is an already registered transmitter with id: ${data.identifier}`, 'debug' );
+				// if setup receiver has already been registered
+				if ( receivers.length > 0 ) {
 
-			}
+					return this.log( `setup data is an already registered receiver with id: ${data.identifier}`, 'debug' );
 
-			// if setup transmitter has already been set up for registering
-			if ( setup_transmitters.length > 0 ) {
+				}
 
-				return this.log( `setup data is an already ready to be registered transmitter with id: ${data.identifier}`, 'debug' );
+				// if setup receiver has already been set up for registering
+				if ( setup_receivers.length > 0 ) {
 
-			}
+					return this.log( `setup data is an already ready to be registered receiver with id: ${data.identifier}`, 'debug' );
 
-			this.app
-			.service( '/setup/transmitters' )
-			.create( { type: data.type, identifier: data.identifier } )
+				}
+
+				this.app
+				.service( '/setup/receivers' )
+				.create( { type: data.type, identifier: data.identifier } )
+				.catch( err => {
+
+					this.log( `error while adding a new receiver to be setup: ${err}`, 'error' );
+
+				} );
+
+			} )
 			.catch( err => {
 
-				this.log( `error while adding a new transmitter to be setup: ${err}`, 'error' );
+				this.log( `error while setting setup data: ${err}`, 'error' );
 
 			} );
 
-		} )
-		.catch( err => {
+		}
 
-			this.log( `error while setting setup data: ${err}`, 'error' );
+		// otherwise, hardware for a transmitter
+		else {
+	
+			Promise.all( [
 
-		} );
+				this.app.service( '/transmitters' ).find( query ),
+				this.app.service( '/setup/transmitters' ).find( query )
 
+			] )
+			.then( ( [ transmitters, setup_transmitters ] ) => {
+
+				// if setup transmitter has already been registered
+				if ( transmitters.length > 0 ) {
+
+					return this.log( `setup data is an already registered transmitter with id: ${data.identifier}`, 'debug' );
+
+				}
+
+				// if setup transmitter has already been set up for registering
+				if ( setup_transmitters.length > 0 ) {
+
+					return this.log( `setup data is an already ready to be registered transmitter with id: ${data.identifier}`, 'debug' );
+
+				}
+
+				this.app
+				.service( '/setup/transmitters' )
+				.create( { type: data.type, identifier: data.identifier } )
+				.catch( err => {
+
+					this.log( `error while adding a new transmitter to be setup: ${err}`, 'error' );
+
+				} );
+
+			} )
+			.catch( err => {
+
+				this.log( `error while setting setup data: ${err}`, 'error' );
+
+			} );
+
+		}
 
 	}
 
@@ -413,7 +461,7 @@ class Service {
 	_onSendMessageThroughSerial( data ) {
 
 		const cmd = {
-			type: 'CMD',
+			type: data.type,
 			identifier: data.identifier,
 			value: data.value
 		};

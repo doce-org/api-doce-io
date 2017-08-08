@@ -51,11 +51,11 @@ exports.down = function( knex, Promise ) {
 
     return Promise.all( [
 
-        knex.schema.dropTable( 'temperatures_sensors_records' ),
-        knex.schema.dropTable( 'humidities_sensors_records' ),
-        knex.schema.dropTable( 'powers_meters_records' ),
-        knex.schema.dropTable( 'waters_meters_records' ),
-        knex.schema.dropTable( 'hardwares' )
+        knex.schema.dropTable( 'transmitters_temperatures_records' ),
+        knex.schema.dropTable( 'transmitters_humidities_records' ),
+        knex.schema.dropTable( 'transmitters_powers_records' ),
+        knex.schema.dropTable( 'transmitters_waters_records' ),
+        knex.schema.dropTable( 'transmitters' )
 
     ] );
 

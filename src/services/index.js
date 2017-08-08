@@ -13,6 +13,8 @@ const transmitterHumidityRecord = require( './transmitter_humidity_record' );
 const transmitterHumidityAverage = require( './transmitter_humidity_avg' );
 const transmitterPowerRecord = require( './transmitter_power_record' );
 const transmitterWaterRecord = require( './transmitter_water_record' );
+// receivers
+const receiver = require( './receiver' );
 // others
 const log = require( './log' );
 
@@ -40,6 +42,9 @@ module.exports = function () {
     app.configure( transmitterPowerRecord );
     app.configure( transmitterWaterRecord );
 
+    // receiver
+    app.configure( receiver );
+    
 	// others
 	app.configure( log );
 
