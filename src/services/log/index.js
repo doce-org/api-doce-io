@@ -8,7 +8,11 @@ module.exports = function () {
 
     const options = {
         Model: app.get( 'knex' ),
-        name: 'logs'
+        name: 'logs',
+        paginate: {
+            default: 5,
+            max: 25
+        }
     };
 
     // Initialize our service with any options it requires

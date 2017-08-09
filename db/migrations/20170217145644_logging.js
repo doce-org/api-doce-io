@@ -9,6 +9,9 @@ exports.up = function( knex, Promise ) {
 			table.enum( 'type', [ 'info', 'warning', 'error', 'debug' ] ).notNullable().defaultTo( 'info' );
 			table.string( 'message' ).notNullable();
             table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
+
+            table.index( 'type' );
+            table.index( 'created_at' );
 		} )
 
     ] );
