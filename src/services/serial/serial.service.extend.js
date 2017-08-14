@@ -15,10 +15,10 @@ const _ = require( 'lodash' );
 const defaults = {
 
 	services: {
-		'TEMP': '/transmitters/temperatures/records',
-		'HUMIDITY': '/transmitters/humidities/records',
-		'POWER': '/transmitters/powers/records',
-		'WATER': '/transmitters/waters/records'
+		'TEMP': '/hardwares/temperatures/records',
+		'HUMIDITY': '/hardwares/humidities/records',
+		'POWER': '/hardwares/powers/records',
+		'WATER': '/hardwares/waters/records'
 	},
 
 	types: {
@@ -34,9 +34,9 @@ class Service {
 
 	/**
 	 * override constructor
-	 * 
+	 *
 	 * @override
-	 * 
+	 *
 	 * @author shad
 	 */
 	constructor() {
@@ -48,23 +48,25 @@ class Service {
 
 	/**
 	 * base setup for service
-	 * 
+	 *
 	 * @override
-	 * 
+	 *
 	 * @author shad
 	 */
     setup( app ) {
+
         this.app = app;
 		this.log = app.get( 'log' );
         this.serial = false;
+
     }
 
 	/**
 	 * override the find method to return the serial, if any available
 	 * will return the current status of the serial connection
-	 * 
+	 *
 	 * @override
-	 * 
+	 *
 	 * @author shad
 	 */
 	find() {
@@ -75,7 +77,7 @@ class Service {
 
     /**
      * setup catching open event on serial port connection
-     * 
+     *
      * @author shad
      */
     _onOpenSerialPort() {
@@ -154,7 +156,7 @@ class Service {
 
 	/**
      * setup catching error on serial port
-     * 
+     *
      * @author shad
      */
     _onSerialPortError() {
@@ -181,7 +183,7 @@ class Service {
 
 	/**
      * setup catching closing serial port connection
-     * 
+     *
      * @author shad
      */
     _onSerialPortClosed() {
@@ -199,7 +201,7 @@ class Service {
 
 	/**
 	 * setup catching receiving data event on serial port connection
-	 * 
+	 *
 	 * @author shad
 	 */
 	_onDataReceivedSerialPort() {
@@ -218,7 +220,7 @@ class Service {
 				if ( data.setup ) {
 
 					this.log( `port has received SETUP data`, 'debug' );
-					
+
 					this._setSetupData( data );
 
 				}
@@ -235,21 +237,21 @@ class Service {
 
 					this.log( `port has received a proper type data: ${defaults.types[ data.type ]}`, 'debug' );
 
-					// find the requested transmitter based on a given identifier and the type of the record
-					this._findTransmitterPk( data ).then( transmitter => {
+					// find the requested hardware based on a given identifier and the type of the record
+					this._findHardwarePk( data ).then( hardware => {
 
-						// if none was found, no transmitter of the requested identifier exist. exiting
-						if ( !transmitter ) {
+						// if none was found, no hardware of the requested identifier exist. exiting
+						if ( !hardware ) {
 
-							this.log( `could not find the requested transmitter identifier`, 'warning' );
+							this.log( `could not find the requested hardware identifier`, 'warning' );
 
 							return;
 
 						}
 
-						this.log( `found the transmitter identifier requested: ${transmitter.name}`, 'debug' );
+						this.log( `found the hardware identifier requested: ${hardware.name}`, 'debug' );
 
-						this._recordNewData( data, transmitter );
+						this._recordNewData( data, hardware );
 
 					} );
 
@@ -257,13 +259,12 @@ class Service {
 
 			}
 
-
 		} );
 
 	}
 
     /**
-	 * find transmitter by ID
+	 * find hardware by ID
 	 *
 	 * @param {Integer} data
 	 *
@@ -273,12 +274,12 @@ class Service {
 	 *
 	 * @author shad
 	 */
-	_findTransmitterPk( data ) {
+	_findHardwarePk( data ) {
 
 		// prepare the request query
 		const query = { query: {
 
-			// find the transmitter id
+			// find the hardware id
 			'identifier': data.identifier,
 
 			// type has to be the one requested
@@ -286,7 +287,7 @@ class Service {
 
 		} };
 
-		return this.app.service( '/transmitters' )
+		return this.app.service( '/hardwares' )
 		.find( query )
 		.then( results => results.length > 0 && results[ 0 ] )
 		.catch( console.error );
@@ -297,24 +298,24 @@ class Service {
 	 * record new data in specified service
 	 *
 	 * @param {Array} data
-	 * @param {Object} transmitter
+	 * @param {Object} hardware
 	 *
 	 * @private
 	 *
 	 * @author shad
 	 */
-	_recordNewData( data, transmitter ) {
+	_recordNewData( data, hardware ) {
 
 		// get the service on which to save the new record
 		const service = defaults.services[ data.type ];
 
 		// extract only the data to be recorded by removing the type and the
-		// transmitter identifier which aren't needed, everything else has to be
+		// hardware identifier which aren't needed, everything else has to be
 		// part of the requested service model ( temperature, power... )
 		let values = _.omit( data, [ 'type', 'identifier' ] );
 
-		// add to the required data the transmitter id previously found in `_findtransmitterPk`
-		values = Object.assign( {}, { transmitter_id: transmitter.id }, values );
+		// add to the required data the hardware id previously found in `_findhardwarePk`
+		values = Object.assign( {}, { hardware_id: hardware.id }, values );
 
 		return this.app.service( service )
 		.create( values )
@@ -348,10 +349,10 @@ class Service {
 	}
 
     /**
-	 * set a temporary setup data for a transmitter to be registered
-	 * 
+	 * set a temporary setup data for a hardware to be registered
+	 *
 	 * @param {String} data
-	 * 
+	 *
 	 * @author shad
 	 */
 	_setSetupData( data ) {
@@ -406,37 +407,37 @@ class Service {
 
 		}
 
-		// otherwise, hardware for a transmitter
+		// otherwise, hardware for a hardware
 		else {
-	
+
 			Promise.all( [
 
-				this.app.service( '/transmitters' ).find( query ),
-				this.app.service( '/setup/transmitters' ).find( query )
+				this.app.service( '/hardwares' ).find( query ),
+				this.app.service( '/setup/hardwares' ).find( query )
 
 			] )
-			.then( ( [ transmitters, setup_transmitters ] ) => {
+			.then( ( [ hardwares, setup_hardwares ] ) => {
 
-				// if setup transmitter has already been registered
-				if ( transmitters.length > 0 ) {
+				// if setup hardware has already been registered
+				if ( hardwares.length > 0 ) {
 
-					return this.log( `setup data is an already registered transmitter with id: ${data.identifier}`, 'debug' );
+					return this.log( `setup data is an already registered hardware with id: ${data.identifier}`, 'debug' );
 
 				}
 
-				// if setup transmitter has already been set up for registering
-				if ( setup_transmitters.length > 0 ) {
+				// if setup hardware has already been set up for registering
+				if ( setup_hardwares.length > 0 ) {
 
-					return this.log( `setup data is an already ready to be registered transmitter with id: ${data.identifier}`, 'debug' );
+					return this.log( `setup data is an already ready to be registered hardware with id: ${data.identifier}`, 'debug' );
 
 				}
 
 				this.app
-				.service( '/setup/transmitters' )
+				.service( '/setup/hardwares' )
 				.create( { type: data.type, identifier: data.identifier } )
 				.catch( err => {
 
-					this.log( `error while adding a new transmitter to be setup: ${err}`, 'error' );
+					this.log( `error while adding a new hardware to be setup: ${err}`, 'error' );
 
 				} );
 
@@ -453,9 +454,9 @@ class Service {
 
 	/**
 	 * send a message through the serial port
-	 * 
+	 *
 	 * @param {Object} data
-	 * 
+	 *
 	 * @author shad
 	 */
 	_onSendMessageThroughSerial( data ) {
@@ -466,8 +467,8 @@ class Service {
 			value: data.value
 		};
 
-		this.log( `trying to send data to transmitter ${data.identifier}: ${data.value.toString()}` );
-		
+		this.log( `trying to send data to hardware ${data.identifier}: ${data.value.toString()}`, 'debug' );
+
 		this.serial.write( JSON.stringify( cmd ) );
 
 	}
@@ -475,11 +476,11 @@ class Service {
     /**
      * override the create service method to provide the
      * possibility to open the serial port connection
-	 * 
+	 *
 	 * @param {Object} data
-     * 
+     *
 	 * @override
-     * 
+     *
 	 * @author shad
      */
     create( data ) {
@@ -497,9 +498,9 @@ class Service {
     /**
      * override the remove service method to provide the
      * possibility to close the serial port connection
-     * 
+     *
      * @override
-     * 
+     *
      * @author shad
      */
     remove() {

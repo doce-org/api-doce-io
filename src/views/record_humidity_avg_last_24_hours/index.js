@@ -4,12 +4,12 @@ const service = require( 'feathers-knex' );
 const hooks = require( './hooks' );
 
 module.exports = function(){
-    
+
     const app = this;
 
     const options = {
         Model: app.get( 'knex' ),
-        name: 'records_humidities_avg_last_24_hours'
+        name: 'records_humidities_averages_last_24_hours'
     };
 
     // Initialize our service with any options it requires

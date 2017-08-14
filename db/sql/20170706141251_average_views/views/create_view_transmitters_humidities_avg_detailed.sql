@@ -1,9 +1,9 @@
-CREATE OR REPLACE VIEW transmitters_humidities_avg_detailed AS
-SELECT "transmitters_humidities_avg".*,
-    "transmitters"."name" AS transmitter_name,
+CREATE OR REPLACE VIEW hardwares_humidities_averages_detailed AS
+SELECT "humidities_averages".*,
+    "hardwares"."name" AS transmitter_name,
     "rooms"."name" AS room_name
 
-FROM "transmitters_humidities_avg"
+FROM "humidities_averages"
 
-INNER JOIN "transmitters" ON "transmitters"."id" = "transmitters_humidities_avg"."transmitter_id"
-INNER JOIN "rooms" ON "rooms"."id" = "transmitters"."room_id";
+INNER JOIN "hardwares" ON "hardwares"."id" = "humidities_averages"."hardware_id"
+INNER JOIN "rooms" ON "rooms"."id" = "hardwares"."room_id";
