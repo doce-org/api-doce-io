@@ -130,24 +130,6 @@ class Service {
 
 				this.log( 'port open', 'debug' );
 
-				// setInterval( () => {
-
-				// 	function getRandomArbitrary( min, max ) {
-				// 		return Math.random() * (max - min) + min;
-				// 	}
-				// 	const rand = getRandomArbitrary( 1, 180 );
-				// 	// console.log( Math.round( rand ).toString() );
-				// 	// this.serial.write( Math.round( rand ).toString() );
-				// 	const cmd = {
-				// 		type: 'CMD',
-				// 		identifier: '2A65DJ1IOI91J90',
-				// 		value: Math.round( rand ).toString()
-				// 	};
-				// 	console.log( JSON.stringify( cmd ) );
-				// 	this.serial.write( JSON.stringify( cmd ) );
-
-				// }, 10000 );
-
 			} );
 
 		} );
@@ -363,92 +345,43 @@ class Service {
 
 		} };
 
-		// if 'CMD' type, means we're receiving setup
-		// data for a receiver hardware
-		if ( data.type === 'CMD' ) {
+		Promise.all( [
 
-			Promise.all( [
+			this.app.service( '/hardwares' ).find( query ),
+			this.app.service( '/setup/hardwares' ).find( query )
 
-				this.app.service( '/receivers' ).find( query ),
-				this.app.service( '/setup/receivers' ).find( query )
+		] )
+		.then( ( [ hardwares, setup_hardwares ] ) => {
 
-			] )
-			.then( ( [ receivers, setup_receivers ] ) => {
+			// if setup hardware has already been registered
+			if ( hardwares.length > 0 ) {
 
-				// if setup receiver has already been registered
-				if ( receivers.length > 0 ) {
+				return this.log( `setup data is an already registered hardware with id: ${data.identifier}`, 'debug' );
 
-					return this.log( `setup data is an already registered receiver with id: ${data.identifier}`, 'debug' );
+			}
 
-				}
+			// if setup hardware has already been set up for registering
+			if ( setup_hardwares.length > 0 ) {
 
-				// if setup receiver has already been set up for registering
-				if ( setup_receivers.length > 0 ) {
+				return this.log( `setup data is an already ready to be registered hardware with id: ${data.identifier}`, 'debug' );
 
-					return this.log( `setup data is an already ready to be registered receiver with id: ${data.identifier}`, 'debug' );
+			}
 
-				}
-
-				this.app
-				.service( '/setup/receivers' )
-				.create( { type: data.type, identifier: data.identifier } )
-				.catch( err => {
-
-					this.log( `error while adding a new receiver to be setup: ${err}`, 'error' );
-
-				} );
-
-			} )
+			this.app
+			.service( '/setup/hardwares' )
+			.create( { type: data.type, identifier: data.identifier } )
 			.catch( err => {
 
-				this.log( `error while setting setup data: ${err}`, 'error' );
+				this.log( `error while adding a new hardware to be setup: ${err}`, 'error' );
 
 			} );
 
-		}
+		} )
+		.catch( err => {
 
-		// otherwise, hardware for a hardware
-		else {
+			this.log( `error while setting setup data: ${err}`, 'error' );
 
-			Promise.all( [
-
-				this.app.service( '/hardwares' ).find( query ),
-				this.app.service( '/setup/hardwares' ).find( query )
-
-			] )
-			.then( ( [ hardwares, setup_hardwares ] ) => {
-
-				// if setup hardware has already been registered
-				if ( hardwares.length > 0 ) {
-
-					return this.log( `setup data is an already registered hardware with id: ${data.identifier}`, 'debug' );
-
-				}
-
-				// if setup hardware has already been set up for registering
-				if ( setup_hardwares.length > 0 ) {
-
-					return this.log( `setup data is an already ready to be registered hardware with id: ${data.identifier}`, 'debug' );
-
-				}
-
-				this.app
-				.service( '/setup/hardwares' )
-				.create( { type: data.type, identifier: data.identifier } )
-				.catch( err => {
-
-					this.log( `error while adding a new hardware to be setup: ${err}`, 'error' );
-
-				} );
-
-			} )
-			.catch( err => {
-
-				this.log( `error while setting setup data: ${err}`, 'error' );
-
-			} );
-
-		}
+		} );
 
 	}
 
