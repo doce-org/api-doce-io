@@ -8,7 +8,7 @@ exports.before = {
     find: [],
     get: [],
     create: [
-		hardware.generateID()
+		hardware.generateNodeID()
 	],
     update: [],
     patch: [],
@@ -19,7 +19,9 @@ exports.after = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [
+		hardware.notifyArduino()
+	],
     update: [],
     patch: [],
     remove: []

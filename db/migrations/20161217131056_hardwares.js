@@ -3,6 +3,8 @@
 const fs = require( 'fs' );
 const sql_folder = '20161217131056_hardwares';
 
+const create_fn_generate_node_id = fs.readFileSync(
+	`${__dirname}/../sql/${sql_folder}/functions/create_fn_generate_node_id.sql` ).toString();
 const create_fn_calculate_avg_temperature = fs.readFileSync(
 	`${__dirname}/../sql/${sql_folder}/functions/create_fn_calculate_avg_temperature.sql` ).toString();
 const create_fn_calculate_avg_humidity = fs.readFileSync(
@@ -15,11 +17,10 @@ exports.up = function( knex, Promise ) {
         knex.schema.createTable( 'hardwares', table => {
 			table.increments( 'id' ).primary();
             table.integer( 'room_id' ).notNullable().references( 'id' ).inTable( 'rooms' ).onDelete( 'CASCADE' );
-			table.integer( 'parent_relay_id' ).references( 'id' ).inTable( 'hardwares' ).onDelete( 'CASCADE' );
-            table.string( 'identifier' ).notNullable();
-			table.string( 'type' ).notNullable();
+            table.string( 'identifier' ).notNullable().unique().comment( 'is "ID" from arduino' );
+			table.string( 'type' ).notNullable().comment( 'is "TYPE" from arduino' );
+			table.integer( 'node' ).notNullable().unique().comment( 'is "NODE" from arduino' );
             table.string( 'name' ).notNullable();
-			table.boolean( 'is_relay' ).defaultTo( false );
 			table.timestamp( 'created_at' ).notNullable().defaultTo( knex.raw( 'now()' ) );
 		} ),
 
@@ -113,7 +114,9 @@ exports.up = function( knex, Promise ) {
 			table.index( 'hardware_id' );
 			table.index( 'type' );
 			table.index( 'created_at' );
-		} )
+		} ),
+
+		knex.schema.raw( create_fn_generate_node_id )
 
     ] );
 
@@ -125,6 +128,7 @@ exports.down = function( knex, Promise ) {
 
 		knex.schema.raw( 'DROP FUNCTION fn_calculate_avg_temperature(varchar, varchar);' ),
 		knex.schema.raw( 'DROP FUNCTION fn_calculate_avg_humidity(varchar, varchar);' ),
+		knex.schema.raw( 'DROP FUNCTION fn_generate_node_id();' ),
 
         knex.schema.dropTable( 'temperatures_records' ),
 		knex.schema.dropTable( 'temperatures_averages' ),

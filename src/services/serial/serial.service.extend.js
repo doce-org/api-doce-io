@@ -15,17 +15,24 @@ const _ = require( 'lodash' );
 const defaults = {
 
 	services: {
-		'TEMP': '/hardwares/temperatures/records',
-		'HUMIDITY': '/hardwares/humidities/records',
-		'POWER': '/hardwares/powers/records',
-		'WATER': '/hardwares/waters/records'
+		'T': '/hardwares/temperatures/records',
+		'TH': '/hardwares/humidities/records',
+		'P': '/hardwares/powers/records',
+		'W': '/hardwares/waters/records'
 	},
 
 	types: {
-		'TEMP': 'temperature',
-		'HUMIDITY': 'humidity',
-		'POWER': 'power',
-		'WATER': 'water'
+		'T': 'temperature',
+		'TH': 'humidity',
+		'P': 'power',
+		'W': 'water'
+	},
+
+	requests: {
+		'S': 'sensors',
+		'C': 'command',
+		'P': 'parameter',
+		'B': 'battery'
 	}
 
 };
@@ -198,8 +205,8 @@ class Service {
 
 			if ( data ) {
 
-				// check if the setup boolean is there
-				if ( data.setup ) {
+				// check if request is of setup mode
+				if ( ( data.REQ === 'S' || data.REQ === 'C' ) && data.NODE === 255 ) {
 
 					this.log( `port has received SETUP data`, 'debug' );
 
@@ -207,26 +214,36 @@ class Service {
 
 				}
 
+				// otherwise, check if we can execute the command
 				else {
 
+					// if type of request is permitted
+					if ( !defaults.requests[ data.REQ ] ) {
+
+						this.log( `port has received data but could not find a request type match`, 'warning' );
+						return;
+
+					}
+
+					this.log( `port has received a proper request type: ${defaults.requests[ data.REQ ]}`, 'debug' );
+
 					// if type of data isn't find in the permitted list of type
-					if( !defaults.types[ data.type ] ) {
+					if( !defaults.types[ data.TYPE ] ) {
 
 						this.log( `port has received data but could not find a type match`, 'warning' );
 						return;
 
 					}
 
-					this.log( `port has received a proper type data: ${defaults.types[ data.type ]}`, 'debug' );
+					this.log( `port has received a proper type data: ${defaults.types[ data.TYPE ]}`, 'debug' );
 
 					// find the requested hardware based on a given identifier and the type of the record
-					this._findHardwarePk( data ).then( hardware => {
+					this._findHardwareIdentifier( data ).then( hardware => {
 
 						// if none was found, no hardware of the requested identifier exist. exiting
 						if ( !hardware ) {
 
 							this.log( `could not find the requested hardware identifier`, 'warning' );
-
 							return;
 
 						}
@@ -256,16 +273,16 @@ class Service {
 	 *
 	 * @author shad
 	 */
-	_findHardwarePk( data ) {
+	_findHardwareIdentifier( data ) {
 
 		// prepare the request query
 		const query = { query: {
 
 			// find the hardware id
-			'identifier': data.identifier,
+			'identifier': data.ID,
 
 			// type has to be the one requested
-			'type': data.type
+			'type': data.TYPE
 
 		} };
 
@@ -289,14 +306,12 @@ class Service {
 	_recordNewData( data, hardware ) {
 
 		// get the service on which to save the new record
-		const service = defaults.services[ data.type ];
+		const service = defaults.services[ data.TYPE ];
 
-		// extract only the data to be recorded by removing the type and the
-		// hardware identifier which aren't needed, everything else has to be
-		// part of the requested service model ( temperature, power... )
-		let values = _.omit( data, [ 'type', 'identifier' ] );
+		// obtain required values
+		let values = data.VALUES;
 
-		// add to the required data the hardware id previously found in `_findhardwarePk`
+		// add to the required data the hardware id previously found in `_findhardwareIdentifier`
 		values = Object.assign( {}, { hardware_id: hardware.id }, values );
 
 		return this.app.service( service )
@@ -341,7 +356,7 @@ class Service {
 
 		const query = { query: {
 
-			identifier: data.identifier
+			identifier: data.ID
 
 		} };
 
@@ -369,7 +384,7 @@ class Service {
 
 			this.app
 			.service( '/setup/hardwares' )
-			.create( { type: data.type, identifier: data.identifier } )
+			.create( { type: data.TYPE, identifier: data.ID } )
 			.catch( err => {
 
 				this.log( `error while adding a new hardware to be setup: ${err}`, 'error' );
@@ -395,9 +410,10 @@ class Service {
 	_onSendMessageThroughSerial( data ) {
 
 		const cmd = {
-			type: data.type,
-			identifier: data.identifier,
-			value: data.value
+			TYPE: data.type,
+			ID: data.identifier,
+			VALUE: data.value,
+			TO_NODE: data.to_node
 		};
 
 		this.log( `trying to send data to hardware ${data.identifier}: ${data.value.toString()}`, 'debug' );

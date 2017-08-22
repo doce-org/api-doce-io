@@ -10,7 +10,9 @@ module.exports = function() {
     // @author shad
     const try_connection = function() {
 
-        app.service( '/serial' ).create( { command: 'open' } ).catch( console.error );
+        app.service( '/serial' )
+		.create( { command: 'open' } )
+		.catch( console.error );
 
     };
 

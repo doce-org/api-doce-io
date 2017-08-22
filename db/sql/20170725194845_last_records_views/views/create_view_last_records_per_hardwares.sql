@@ -3,7 +3,7 @@ CREATE OR REPLACE VIEW last_records_per_hardwares AS
 SELECT "hardwares".*,
 
 	CASE
-		WHEN "hardwares"."type" = 'TEMPERATURE' THEN
+		WHEN "hardwares"."type" = 'T' THEN
 			( SELECT ROW_TO_JSON( tt ) FROM (
 				SELECT "temperatures_records".*
 				FROM "temperatures_records"
@@ -11,7 +11,7 @@ SELECT "hardwares".*,
 				ORDER BY "temperatures_records"."created_at" DESC
 				LIMIT 1
 			) tt )
-		WHEN "hardwares"."type" = 'HUMIDITY' THEN
+		WHEN "hardwares"."type" = 'TH' THEN
 			( SELECT ROW_TO_JSON( th ) FROM(
                 SELECT "humidities_records".*
 				FROM "humidities_records"
@@ -19,7 +19,7 @@ SELECT "hardwares".*,
 				ORDER BY "humidities_records"."created_at" DESC
 				LIMIT 1
 			) th )
-		WHEN "hardwares"."type" = 'POWER' THEN
+		WHEN "hardwares"."type" = 'P' THEN
 			( SELECT ROW_TO_JSON( tp ) FROM(
                 SELECT "powers_records".*
 				FROM "powers_records"
@@ -27,7 +27,7 @@ SELECT "hardwares".*,
 				ORDER BY "powers_records"."created_at" DESC
 				LIMIT 1
 			) tp )
-		WHEN "hardwares"."type" = 'POWER' THEN
+		WHEN "hardwares"."type" = 'W' THEN
 			( SELECT ROW_TO_JSON( tw ) FROM(
                 SELECT "waters_records".*
 				FROM "waters_records"
