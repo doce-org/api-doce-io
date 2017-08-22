@@ -206,7 +206,7 @@ class Service {
 			if ( data ) {
 
 				// check if request is of setup mode
-				if ( ( data.REQ === 'S' || data.REQ === 'C' ) && data.NODE === 255 ) {
+				if ( ( data.REQ === 'S' || data.REQ === 'C' ) && data.NODE === '255' ) {
 
 					this.log( `port has received SETUP data`, 'debug' );
 
@@ -410,6 +410,7 @@ class Service {
 	_onSendMessageThroughSerial( data ) {
 
 		const cmd = {
+			REQ: data.request_type,
 			TYPE: data.type,
 			ID: data.identifier,
 			VALUE: data.value,

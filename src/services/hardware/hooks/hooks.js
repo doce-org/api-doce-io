@@ -21,14 +21,14 @@ exports.generateNodeID = function () {
 			const knex = hook.app.get( 'knex' );
 
 			// request the proper function to obtain a unique node id
-			const query = knex.select( '*' ).from( knex.raw( 'fn_generate_node_id' ) );
+			const query = knex.select( '*' ).from( knex.raw( 'fn_generate_node_id()' ) );
 
 			return query.then( result => {
 
 				// hook.app.get( 'log' )( 'successfully created a node id: ${result[ 0 ]}', 'debug' );
 
 				// set the newly generated node id
-				hook.data.node = result[ 0 ];
+				hook.data.node = result[ 0 ].node_id;
 
 				resolve( hook );
 
@@ -55,6 +55,12 @@ exports.notifyArduino = function () {
 
 		// build the command query to be send to the arduino
 		const serial_cmd = {
+
+			// make sure to use the send method
+			command: 'send',
+
+			// request type
+			request_type: 'P',
 
 			// config' type
 			type: 'SNI',
@@ -83,7 +89,7 @@ exports.notifyArduino = function () {
 
 			hook.app.service( '/serial' ).create( serial_cmd ),
 
-			hook.app.service( '/hardwares/setup' ).remove( remove_setup_hardware )
+			hook.app.service( '/setup/hardwares' ).remove( null, remove_setup_hardware )
 
 		] )
 		.then( () => hook )
